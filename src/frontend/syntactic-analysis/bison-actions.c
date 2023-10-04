@@ -24,12 +24,24 @@ void yyerror(const char * string) {
 	LogErrorRaw("' (length = %d, linea %d).\n\n", yyleng, yylineno);
 }
 
+int EqualBooleanGrammarAction(const int leftValue, const int rightValue) {
+	LogDebug("[Bison] EqualBooleanGrammarAction(%d, %d)", leftValue, rightValue);
+	//$$ = $left == $right;
+	return 1;
+}
+
 /**
 * Esta acción se corresponde con el no-terminal que representa el símbolo
 * inicial de la gramática, y por ende, es el último en ser ejecutado, lo que
 * indica que efectivamente el programa de entrada se pudo generar con esta
 * gramática, o lo que es lo mismo, que el programa pertenece al lenguaje.
 */
+
+int ConditionalsGrammarAction() {
+	LogDebug("[Bison] ConditionalsGrammarAction(%d)", 0);
+	return 0;
+}
+
 int ProgramGrammarAction(const int value) {
 	LogDebug("[Bison] ProgramGrammarAction(%d)", value);
 	/*

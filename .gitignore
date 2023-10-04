@@ -1,0 +1,10 @@
+bin/
+
+flex-scanner.c
+flex-scanner.o
+
+bison-parser.c
+bison-parser.o
+bison-parser.h
+
+program

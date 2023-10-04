@@ -32,6 +32,20 @@ token MultiplicationOperatorPatternAction();
 token OpenParenthesisPatternAction();
 token SubtractionOperatorPatternAction();
 
+token LessThanPatternAction(yytext);
+token GreaterThanPatternAction(yytext);
+token EqualPatternAction();
+token WhenPatternAction();
+token IfPatternAction();
+token EqualEqualPatternAction();
+token GreaterThanOrEqualPatternAction();
+token LessThanOrEqualPatternAction();
+token NotEqualPatternAction();
+
+// void BeginStringPatternAction();
+// token StringPatternAction(yytext, yyleng);
+// void EndStringPatternAction();
+
 // Patrón desconocido, permite abortar debido a un error de sintaxis.
 token UnknownPatternAction(const char * lexeme, const int length);
 

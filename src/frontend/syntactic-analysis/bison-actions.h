@@ -28,4 +28,8 @@ int ConstantFactorGrammarAction(const int value);
 // Constantes.
 int IntegerConstantGrammarAction(const int value);
 
+int ConditionalsGrammarAction();
+
+int EqualBooleanGrammarAction(const int leftValue, const int rightValue);  
+
 #endif
