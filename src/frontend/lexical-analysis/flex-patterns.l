@@ -44,61 +44,61 @@ var             [a-zA-Z][a-zA-Z0-9_]*
 <COMMENT>"*/"								{ EndCommentPatternAction(); BEGIN(INITIAL); }
 
 
-"+"											{ return AdditionOperatorPatternAction(yytext); }
-"-"											{ return SubtractionOperatorPatternAction(yytext); }
-"*"											{ return MultiplicationOperatorPatternAction(yytext); }
-"/"											{ return DivisionOperatorPatternAction(yytext); }
+"+"											{ return AdditionOperatorPatternAction(); }
+"-"											{ return SubtractionOperatorPatternAction(); }
+"*"											{ return MultiplicationOperatorPatternAction(); }
+"/"											{ return DivisionOperatorPatternAction(); }
 
-"("											{ return OpenParenthesisPatternAction(yytext); }
-")"											{ return CloseParenthesisPatternAction(yytext); }
+"("											{ return OpenParenthesisPatternAction(); }
+")"											{ return CloseParenthesisPatternAction(); }
 
-"char"                                   
-"string" 
-"int"
-"bool"
-"block"
-"gobject"
-"scene"
-"button"
-"text"
+"char"                                      { return CharPatternAction();             }
+"string"                                    { return StringPatternAction(); }
+"int"                                       { return IntPatternAction(); }
+"bool"                                      { return BoolPatternAction(); }
+"block"                                     { return BlockPatternAction();}
+"gobject"                                   { return GobjectPatternAction();}
+"scene"                                     { return ScenePatternAction();}   
+"button"                                    {return ButtonPatternAction();}
+"text"                                      {return TextPatternAction();}
 
-"when"                                      { return WhenPatternAction(yytext); }
-"for"
-"while"
-"if"                                        { return IfPatternAction(yytext); }
-"elif"
-"else"
-"in"
+"when"                                      { return WhenPatternAction(); }
+"for"                                       { return ForPatternAction();} 
+"while"                                     {return WhilePatternAction();}
+"if"                                        { return IfPatternAction(); }
+"elif"                                      {return ElifPatternAction();}
+"else"                                      {return ElsePatternAction();}
+"in"                                        {return InPatternAction();}
 
-"<"                                         { return LessThanPatternAction(yytext); }
-">"                                        { return GreaterThanPatternAction(yytext); }
-"="                                        { return EqualPatternAction(yytext); }
-"!="                                       { return NotEqualPatternAction(yytext); }
-"<="                                      { return LessThanOrEqualPatternAction(yytext); }
-">="                                     { return GreaterThanOrEqualPatternAction(yytext); }
-"=="                                    { return EqualEqualPatternAction(yytext); }
+"<"                                         { return LessThanPatternAction(); }
+">"                                        { return GreaterThanPatternAction(); }
+"="                                        { return EqualPatternAction(); }
+"!="                                       { return NotEqualPatternAction(); }
+"<="                                      { return LessThanOrEqualPatternAction(); }
+">="                                     { return GreaterThanOrEqualPatternAction(); }
+"=="                                    { return EqualEqualPatternAction(); }
 
-"++"
-"--"
-"+="
-"-="
-"*="
-"/="
+"++"                                        { return IncrementPatternAction(); }
+"--"                                        { return DecrementPatternAction(); }
+"+="                                        { return PlusEqualPatternAction(); }
+"-="                                        { return MinusEqualPatternAction(); }
+"*="                                        { return MulEqualPatternAction(); }
+"/="                                        {return SlashEqualPatternAction();}
 
-"!"{var}
-"NOT"
-"not"
-"AND"
-"and"
-"OR"
-"or"
-
-"\""                                        { BEGIN(STRING); /* BeginStringPatternAction(); */ }
+"!"{var}                                    { return NegationPatternAction(yytext,yyleng); }
+"NOT"                                       { return NotPatternAction();}
+"not"                                       { return NotPatternAction();}
+"AND"                                       { return AndPatternAction();}        
+"and"                                       { return AndPatternAction();}
+"OR"                                        { return OrPatternAction();}        
+"or"                                        { return OrPatternAction();}
+{var}                                       { return VarPatternAction(const char *lexeme, const int length); }
+"\""                                        { BEGIN(STRING);  BeginStringPatternAction();  }
 <STRING>.									{ IgnoredPatternAction(yytext, yyleng); /*todo*/ }
-<STRING>"\""								{ /* EndStringPatternAction(); */ BEGIN(INITIAL); }
+<STRING>"\""								{  EndStringPatternAction();  BEGIN(INITIAL); }
 
-"RGB"
-"px"
+"RGB"                                       {return RgbPatternAction();}
+"px"                                        {return PxPatternAction();}
 
 {digit}+									{ return IntegerPatternAction(yytext, yyleng); }
 
@@ -106,8 +106,37 @@ var             [a-zA-Z][a-zA-Z0-9_]*
 
 .											{ return UnknownPatternAction(yytext, yyleng); }
 
-{letter}+
+{letter}+                                   { return LetterPatternAction(yytext, yyleng); }
 
+
+"#DEFINE"{whitespace}+{letter}+             { return ConstPatternAction(yytext, yyleng); }
+
+"STDIN"                                     { return StdinPatternAction(); }
+"STDOUT"                                    { return StdoutPatternAction(); }
+
+";"                                        { return SemicolonPatternAction(); }
+","                                       { return CommaPatternAction(); }
+"."                                     { return DotPatternAction(); }
+
+"{"                                        { return OpenBracePatternAction(); }
+"}"                                       { return CloseBracePatternAction(); }
+
+"["                                        { return OpenBracketPatternAction(); }
+"]"                                       { return CloseBracketPatternAction(); }
+
+"true"                                     { return TruePatternAction(); }
+"TRUE"                                    { return TruePatternAction();}
+"false"                                    { return FalsePatternAction(); }
+"FALSE"                                   { return FalsePatternAction(); }
+
+"this"                                   { return ThisPatternAction(); }
+"THIS"                                  { return ThisPatternAction(); }
+
+"NULL"                                 { return NullPatternAction(); }
+"null"                                 { return NullPatternAction(); }
+
+"mainScene"                                { return MainScenePatternAction(); }
+"return"                                    { return ReturnPatternAction(); }
 %%
 
 

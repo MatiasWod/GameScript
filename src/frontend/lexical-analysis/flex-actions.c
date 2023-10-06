@@ -31,6 +31,16 @@ void BeginCommentPatternAction()
 	LogDebug("[Flex] [COMMENT] BeginCommentPatternAction............................");
 }
 
+void BeginStringPatternAction()
+{
+	LogDebug("[Flex] [STRING] BeginCommentPatternAction.............................");
+}
+
+void EndStringPatternAction()
+{
+	LogDebug("[Flex] [STRING] EndStringPatternAction................................");
+}
+
 void EndCommentPatternAction()
 {
 	LogDebug("[Flex] [COMMENT] EndCommentPatternAction..............................");
@@ -147,6 +157,13 @@ token NotEqualPatternAction()
 	return NOT_EQUAL;
 }
 
+token NegationPatternAction(const char *lexeme, const int length)
+{
+	LogDebug("[Flex] NegationPatternAction: '!'.");
+	yylval.token = NEGATION;
+	return NEGATION;
+}
+
 /*token BeginWhenPatternAction() {
 	LogDebug("[Flex] BeginWhenPatternAction: 'when'.");
 	yylval.token = WHEN;
@@ -207,4 +224,306 @@ void IgnoredPatternAction(const char *lexeme, const int length)
 	free(lexemeCopy);
 	// Como no debe hacer nada con el patrón, solo se loguea en consola.
 	// No se emite ningún token.
+}
+
+token CharPatternAction()
+{
+	LogDebug("[Flex] CharPatternAction: 'char'.");
+	yylval.token = CHAR;
+	return CHAR;
+}
+
+token StringPatternAction()
+{
+	LogDebug("[Flex] StringPatternAction: 'string'.");
+	yylval.token = STRING;
+	return STRING;
+}
+
+token IntPatternAction()
+{
+	LogDebug("[Flex] IntPatternAction: 'int'.");
+	yylval.token = INT;
+	return INT;
+}
+
+token BoolPatternAction()
+{
+	LogDebug("[Flex] BoolPatternAction: 'bool'.");
+	yylval.token = BOOL;
+	return BOOL;
+}
+
+token BlockPatternAction()
+{
+	LogDebug("[Flex] BlockPatternAction: 'block'.");
+	yylval.token = BLOCK;
+	return BLOCK;
+}
+
+token GobjectPatternAction()
+{
+	LogDebug("[Flex] GobjectPatternAction: 'gobject'.");
+	yylval.token = GOBJECT;
+	return GOBJECT;
+}
+
+token ScenePatternAction()
+{
+	LogDebug("[Flex] ScenePatternAction: 'scene'.");
+	yylval.token = SCENE;
+	return SCENE;
+}
+
+token ButtonPatternAction()
+{
+	LogDebug("[Flex] ButtonPatternAction: 'button'.");
+	yylval.token = BUTTON;
+	return BUTTON;
+}
+
+token TextPatternAction()
+{
+	LogDebug("[Flex] TextPatternAction: 'text'.");
+	yylval.token = TEXT;
+	return TEXT;
+}
+
+token ForPatternAction()
+{
+	LogDebug("[Flex] ForPatternAction: 'for'.");
+	yylval.token = FOR;
+	return FOR;
+}
+
+token WhilePatternAction()
+{
+	LogDebug("[Flex] WhilePatternAction: 'while'.");
+	yylval.token = WHILE;
+	return WHILE;
+}
+
+token ElifPatternAction()
+{
+	LogDebug("[Flex] ElifPatternAction: 'elif'.");
+	yylval.token = ELIF;
+	return ELIF;
+}
+
+token ElsePatternAction()
+{
+	LogDebug("[Flex] ElsePatternAction: 'else'.");
+	yylval.token = ELSE;
+	return ELSE;
+}
+
+token InPatternAction()
+{
+	LogDebug("[Flex] InPatternAction: 'in'.");
+	yylval.token = IN;
+	return IN;
+}
+
+token IncrementPatternAction()
+{
+	LogDebug("[Flex] IncrementPatternAction: '++'.");
+	yylval.token = INCREMENT;
+	return INCREMENT;
+}
+
+token DecrementPatternAction()
+{
+	LogDebug("[Flex] DecrementPatternAction: '--'.");
+	yylval.token = DECREMENT;
+	return DECREMENT;
+}
+
+token PlusEqualPatternAction()
+{
+	LogDebug("[Flex] PlusEqualPatternAction: '+='.");
+	yylval.token = PLUS_EQUAL;
+	return PLUS_EQUAL;
+}
+
+token MinusEqualPatternAction()
+{
+	LogDebug("[Flex] MinusEqualPatternAction: '-='.");
+	yylval.token = MINUS_EQUAL;
+	return MINUS_EQUAL;
+}
+
+token MulEqualPatternAction()
+{
+	LogDebug("[Flex] MulEqualPatternAction: '*='.");
+	yylval.token = MUL_EQUAL;
+	return MUL_EQUAL;
+}
+
+token SlashEqualPatternAction()
+{
+	LogDebug("[Flex] SlashEqualPatternAction: '/='.");
+	yylval.token = SLASH_EQUAL;
+	return SLASH_EQUAL;
+}
+
+token NotPatternAction()
+{
+	LogDebug("[Flex] NotPatternAction: 'NOT'.");
+	yylval.token = NOT;
+	return NOT;
+}
+
+token AndPatternAction()
+{
+	LogDebug("[Flex] AndPatternAction: 'AND'.");
+	yylval.token = AND;
+	return AND;
+}
+
+token OrPatternAction()
+{
+	LogDebug("[Flex] OrPatternAction: 'OR'.");
+	yylval.token = OR;
+	return OR;
+}
+
+token RgbPatternAction()
+{
+	LogDebug("[Flex] RgbPatternAction: 'RGB'.");
+	yylval.token = RGB;
+	return RGB;
+}
+
+token PxPatternAction()
+{
+	LogDebug("[Flex] PxPatternAction: 'PX'.");
+	yylval.token = PX;
+	return PX;
+}
+
+token LetterPatternAction(const char *lexeme, const int length)
+{
+	LogDebug("[Flex] LetterPatternAction: 'LETTER'.");
+	yylval.token = LETTER;
+	return LETTER;
+}
+
+token ConstPatternAction(const char *lexeme, const int length)
+{
+	LogDebug("[Flex] ConstPatternAction: 'CONST'.");
+	yylval.token = CONST;
+	return CONST;
+}
+
+token StdinPatternAction()
+{
+	LogDebug("[Flex] StdinPatternAction: 'STDIN'.");
+	yylval.token = STDIN;
+	return STDIN;
+}
+
+token StdoutPatternAction()
+{
+	LogDebug("[Flex] StdoutPatternAction: 'STDOUT'.");
+	yylval.token = STDOUT;
+	return STDOUT;
+}
+
+token SemicolonPatternAction()
+{
+	LogDebug("[Flex] SemicolonPatternAction: ';'.");
+	yylval.token = SEMICOLON;
+	return SEMICOLON;
+}
+
+token CommaPatternAction()
+{
+	LogDebug("[Flex] CommaPatternAction: ','.");
+	yylval.token = COMMA;
+	return COMMA;
+}
+
+token DotPatternAction()
+{
+	LogDebug("[Flex] DotPatternAction: '.'.");
+	yylval.token = DOT;
+	return DOT;
+}
+
+token OpenBracePatternAction()
+{
+	LogDebug("[Flex] OpenBracePatternAction: '{'.");
+	yylval.token = OPEN_BRACE;
+	return OPEN_BRACE;
+}
+
+token CloseBracePatternAction()
+{
+	LogDebug("[Flex] CloseBracePatternAction: '}'.");
+	yylval.token = CLOSE_BRACE;
+	return CLOSE_BRACE;
+}
+
+token OpenBracketPatternAction()
+{
+	LogDebug("[Flex] OpenBracketPatternAction: '['.");
+	yylval.token = OPEN_BRACKET;
+	return OPEN_BRACKET;
+}
+
+token CloseBracketPatternAction()
+{
+	LogDebug("[Flex] CloseBracketPatternAction: ']'.");
+	yylval.token = CLOSE_BRACKET;
+	return CLOSE_BRACKET;
+}
+
+token TruePatternAction()
+{
+	LogDebug("[Flex] TruePatternAction: 'true'.");
+	yylval.token = TRUE;
+	return TRUE;
+}
+
+token FalsePatternAction()
+{
+	LogDebug("[Flex] FalsePatternAction: 'false'.");
+	yylval.token = FALSE;
+	return FALSE;
+}
+
+token ThisPatternAction()
+{
+	LogDebug("[Flex] ThisPatternAction: 'this'.");
+	yylval.token = THIS;
+	return THIS;
+}
+
+token NullPatternAction()
+{
+	LogDebug("[Flex] NullPatternAction: 'null'.");
+	yylval.token = NULL;
+	return NULL;
+}
+
+token MainScenePatternAction()
+{
+	LogDebug("[Flex] MainScenePatternAction: 'main_scene'.");
+	yylval.token = MAIN_SCENE;
+	return MAIN_SCENE;
+}
+
+token ReturnPatternAction()
+{
+	LogDebug("[Flex] ReturnPatternAction: 'return'.");
+	yylval.token = RETURN;
+	return RETURN;
+}
+
+token VarPatternAction(const char *lexeme, const int length)
+{
+	LogDebug("[Flex] VarPatternAction: '%s' (length = %d).", lexeme, length);
+	char *lexemeCopy = copyLexeme(lexeme, length);
+	yylval.token = lexemeCopy;
+	return NAME;
 }
