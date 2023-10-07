@@ -29,7 +29,7 @@ endline			[\n]
 whitespace		[ \f\n\r\t\v]
 justspace       [ \t\v]
 letter          [a-zA-Z]
-var             [a-zA-Z][a-zA-Z0-9_]*
+var             [a-zA-Z0-9_]
 /* condition     "("({var}(!{justspace}+)?("|!="{justspace}+"{var}"{justspace}*")"({justspace}+"{var})?")" */
 
 %%
@@ -59,16 +59,16 @@ var             [a-zA-Z][a-zA-Z0-9_]*
 "block"                                     { return BlockPatternAction();}
 "gobject"                                   { return GobjectPatternAction();}
 "scene"                                     { return ScenePatternAction();}   
-"button"                                    {return ButtonPatternAction();}
-"text"                                      {return TextPatternAction();}
+"button"                                    { return ButtonPatternAction();}
+"text"                                      { return TextPatternAction();}
 
 "when"                                      { return WhenPatternAction(); }
 "for"                                       { return ForPatternAction();} 
-"while"                                     {return WhilePatternAction();}
+"while"                                     { return WhilePatternAction(); }
 "if"                                        { return IfPatternAction(); }
-"elif"                                      {return ElifPatternAction();}
-"else"                                      {return ElsePatternAction();}
-"in"                                        {return InPatternAction();}
+"elif"                                      { return ElifPatternAction();}
+"else"                                      { return ElsePatternAction();}
+"in"                                        { return InPatternAction();}
 
 "<"                                         { return LessThanPatternAction(); }
 ">"                                        { return GreaterThanPatternAction(); }
@@ -92,7 +92,7 @@ var             [a-zA-Z][a-zA-Z0-9_]*
 "and"                                       { return AndPatternAction();}
 "OR"                                        { return OrPatternAction();}        
 "or"                                        { return OrPatternAction();}
-{var}                                       { return VarPatternAction(const char *lexeme, const int length); }
+{letter}{var}*                              { return VarPatternAction(yytext,yyleng);}
 "\""                                        { BEGIN(STRING);  BeginStringPatternAction();  }
 <STRING>.									{ IgnoredPatternAction(yytext, yyleng); /*todo*/ }
 <STRING>"\""								{  EndStringPatternAction();  BEGIN(INITIAL); }

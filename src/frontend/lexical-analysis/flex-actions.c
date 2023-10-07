@@ -481,15 +481,15 @@ token CloseBracketPatternAction()
 token TruePatternAction()
 {
 	LogDebug("[Flex] TruePatternAction: 'true'.");
-	yylval.token = TRUE;
-	return TRUE;
+	yylval.token = TRUE_TOKEN;
+	return TRUE_TOKEN;
 }
 
 token FalsePatternAction()
 {
 	LogDebug("[Flex] FalsePatternAction: 'false'.");
-	yylval.token = FALSE;
-	return FALSE;
+	yylval.token = FALSE_TOKEN;
+	return FALSE_TOKEN;
 }
 
 token ThisPatternAction()
@@ -502,8 +502,8 @@ token ThisPatternAction()
 token NullPatternAction()
 {
 	LogDebug("[Flex] NullPatternAction: 'null'.");
-	yylval.token = NULL;
-	return NULL;
+	yylval.token = NULL_TOKEN;
+	return NULL_TOKEN;
 }
 
 token MainScenePatternAction()
@@ -525,5 +525,6 @@ token VarPatternAction(const char *lexeme, const int length)
 	LogDebug("[Flex] VarPatternAction: '%s' (length = %d).", lexeme, length);
 	char *lexemeCopy = copyLexeme(lexeme, length);
 	yylval.token = lexemeCopy;
+	free(lexemeCopy);
 	return NAME;
 }
