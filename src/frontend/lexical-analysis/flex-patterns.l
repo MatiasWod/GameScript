@@ -30,18 +30,20 @@ whitespace		[ \f\n\r\t\v]
 justspace       [ \t\v]
 letter          [a-zA-Z]
 var             [a-zA-Z0-9_]
+allcharacters  [a-zA-Z0-9_ \t\v]
+optionalThis    ["."{letter}{var}+]
 /* condition     "("({var}(!{justspace}+)?("|!="{justspace}+"{var}"{justspace}*")"({justspace}+"{var})?")" */
 
 %%
 
 "//"                                        { BEGIN(COMMENTLINE); BeginCommentPatternAction(); }
-<COMMENTLINE>.								{ IgnoredPatternAction(yytext, yyleng); }
 <COMMENTLINE>{endline}                      { EndCommentPatternAction(); BEGIN(INITIAL); }
+<COMMENTLINE>.								{ IgnoredPatternAction(yytext, yyleng); }
 
 "/*"										{ BEGIN(COMMENT); BeginCommentPatternAction(); }
-<COMMENT>.									{ IgnoredPatternAction(yytext, yyleng); }
 <COMMENT>{endline}+							{ IgnoredPatternAction(yytext, yyleng); }
 <COMMENT>"*/"								{ EndCommentPatternAction(); BEGIN(INITIAL); }
+<COMMENT>.									{ IgnoredPatternAction(yytext, yyleng); }
 
 
 "+"											{ return AdditionOperatorPatternAction(); }
@@ -51,6 +53,13 @@ var             [a-zA-Z0-9_]
 
 "("											{ return OpenParenthesisPatternAction(); }
 ")"											{ return CloseParenthesisPatternAction(); }
+
+"{"                                        { return OpenBracePatternAction(); }
+"}"                                       { return CloseBracePatternAction(); }
+
+"["                                        { return OpenBracketPatternAction(); }
+"]"                                       { return CloseBracketPatternAction(); }
+
 
 "char"                                      { return CharPatternAction();             }
 "string"                                    { return StringPatternAction(); }
@@ -92,10 +101,12 @@ var             [a-zA-Z0-9_]
 "and"                                       { return AndPatternAction();}
 "OR"                                        { return OrPatternAction();}        
 "or"                                        { return OrPatternAction();}
-{letter}{var}*                              { return VarPatternAction(yytext,yyleng);}
+ /* {letter}{var}*                              { return VarPatternAction(yytext,yyleng);} */
 "\""                                        { BEGIN(STRING);  BeginStringPatternAction();  }
-<STRING>.									{ IgnoredPatternAction(yytext, yyleng); /*todo*/ }
+<STRING>{allcharacters}+								    { return StringTextPatternAction(yytext,yyleng); /*todo*/ }
 <STRING>"\""								{  EndStringPatternAction();  BEGIN(INITIAL); }
+<STRING>.								{ IgnoredPatternAction(yytext, yyleng); /*todo*/ }
+
 
 "RGB"                                       {return RgbPatternAction();}
 "px"                                        {return PxPatternAction();}
@@ -104,12 +115,7 @@ var             [a-zA-Z0-9_]
 
 {whitespace}+								{ IgnoredPatternAction(yytext, yyleng); }
 
-.											{ return UnknownPatternAction(yytext, yyleng); }
-
-{letter}+                                   { return LetterPatternAction(yytext, yyleng); }
-
-
-"#DEFINE"{whitespace}+{letter}+             { return ConstPatternAction(yytext, yyleng); }
+"#DEFINE"                                      { return ConstPatternAction(); }
 
 "STDIN"                                     { return StdinPatternAction(); }
 "STDOUT"                                    { return StdoutPatternAction(); }
@@ -118,25 +124,28 @@ var             [a-zA-Z0-9_]
 ","                                       { return CommaPatternAction(); }
 "."                                     { return DotPatternAction(); }
 
-"{"                                        { return OpenBracePatternAction(); }
-"}"                                       { return CloseBracePatternAction(); }
-
-"["                                        { return OpenBracketPatternAction(); }
-"]"                                       { return CloseBracketPatternAction(); }
 
 "true"                                     { return TruePatternAction(); }
 "TRUE"                                    { return TruePatternAction();}
 "false"                                    { return FalsePatternAction(); }
 "FALSE"                                   { return FalsePatternAction(); }
 
-"this"                                   { return ThisPatternAction(); }
-"THIS"                                  { return ThisPatternAction(); }
-
+"this"{optionalThis}?                                 { return ThisPatternAction(yytext, yyleng); }
+"THIS"{optionalThis}?                             { return ThisPatternAction(yytext, yyleng); }
+{letter}{var}+"."{letter}{var}+                                  { return VarPatternAction(yytext, yyleng); }
 "NULL"                                 { return NullPatternAction(); }
 "null"                                 { return NullPatternAction(); }
 
 "mainScene"                                { return MainScenePatternAction(); }
 "return"                                    { return ReturnPatternAction(); }
+{letter}{var}+									{ return VarnamePatternAction(yytext, yyleng); }
+
+.											{ return UnknownPatternAction(yytext, yyleng); }
+
+ /* {letter}+                                   { return LetterPatternAction(yytext, yyleng); } */
+
+
+
 %%
 
 

@@ -33,7 +33,7 @@ void BeginCommentPatternAction()
 
 void BeginStringPatternAction()
 {
-	LogDebug("[Flex] [STRING] BeginCommentPatternAction.............................");
+	LogDebug("[Flex] [STRING] BeginStringPatternAction.............................");
 }
 
 void EndStringPatternAction()
@@ -404,11 +404,12 @@ token PxPatternAction()
 token LetterPatternAction(const char *lexeme, const int length)
 {
 	LogDebug("[Flex] LetterPatternAction: 'LETTER'.");
-	yylval.token = LETTER;
-	return LETTER;
+//	yylval.token = LETTER;
+//	return LETTER;
+	return VARNAME;
 }
 
-token ConstPatternAction(const char *lexeme, const int length)
+token ConstPatternAction()
 {
 	LogDebug("[Flex] ConstPatternAction: 'CONST'.");
 	yylval.token = CONST;
@@ -492,9 +493,10 @@ token FalsePatternAction()
 	return FALSE_TOKEN;
 }
 
-token ThisPatternAction()
+token ThisPatternAction(const char *lexeme, const int length)
 {
 	LogDebug("[Flex] ThisPatternAction: 'this'.");
+	char *lexemeCopy = copyLexeme(lexeme, length);
 	yylval.token = THIS;
 	return THIS;
 }
@@ -524,7 +526,30 @@ token VarPatternAction(const char *lexeme, const int length)
 {
 	LogDebug("[Flex] VarPatternAction: '%s' (length = %d).", lexeme, length);
 	char *lexemeCopy = copyLexeme(lexeme, length);
-	yylval.token = lexemeCopy;
-	free(lexemeCopy);
-	return NAME;
+	yylval.string = lexemeCopy;
+	//return NAME;
+	return VARNAME;
+}
+
+token VarnamePatternAction(const char * lexeme, const int length) {
+	LogDebug("VarnamePatternAction: '%s' (length = %d).", lexeme, length);
+    char * varname = (char *) calloc(length + 1, sizeof(char));
+    strncpy(varname, lexeme, length);
+    yylval.string = varname;
+	return VARNAME;
+}
+
+token StringTextPatternAction(const char * lexeme, const int length) {
+	LogDebug("StringPatternAction: '%s' (length = %d).", lexeme, length);
+	char * string = (char *) calloc(length + 1, sizeof(char));
+	strncpy(string, lexeme, length);
+	yylval.string = string;
+	return STRING_TEXT;
+}
+
+token ArrayPatternAction(const char * lexeme, const int length)
+{
+	LogDebug("[Flex] ArrayPatternAction: 'array'.");
+	yylval.token = ARRAY;
+	return ARRAY;
 }

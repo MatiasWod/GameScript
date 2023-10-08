@@ -23,6 +23,8 @@
 void BeginCommentPatternAction();
 void EndCommentPatternAction();
 
+token VarnamePatternAction(const char * lexeme, const int length);
+
 // Patrones terminales del lenguaje diseñado.
 token AdditionOperatorPatternAction();
 token CloseParenthesisPatternAction();
@@ -77,7 +79,7 @@ token AndPatternAction();
 token OrPatternAction();
 token RgbPatternAction();
 token PxPatternAction();
-token ConstPatternAction(const char *lexeme, const int length);
+token ConstPatternAction();
 token StdinPatternAction();
 token StdoutPatternAction();
 token IntegerPatternAction(const char *lexeme, const int length);
@@ -92,7 +94,7 @@ token OpenBracketPatternAction();
 token CloseBracketPatternAction();
 token TruePatternAction();
 token FalsePatternAction();
-token ThisPatternAction();
+token ThisPatternAction(const char *lexeme, const int length);
 token NullPatternAction();
 token MainScenePatternAction();
 token ReturnPatternAction();
@@ -100,5 +102,6 @@ token VarPatternAction(const char *lexeme, const int length);
 
 void BeginStringPatternAction();
 void EndStringPatternAction();
-
+token StringTextPatternAction(const char * lexeme, const int length);
+token ArrayPatternAction(const char * lexeme, const int length);
 #endif
