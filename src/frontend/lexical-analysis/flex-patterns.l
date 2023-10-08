@@ -50,6 +50,13 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 <COMMENT>.									{ IgnoredPatternAction(yytext, yyleng); }
 
 
+"++"                                        { return IncrementPatternAction(); }
+"--"                                        { return DecrementPatternAction(); }
+"+="                                        { return PlusEqualPatternAction(); }
+"-="                                        { return MinusEqualPatternAction(); }
+"*="                                        { return MulEqualPatternAction(); }
+"/="                                        { return SlashEqualPatternAction();}
+
 "+"											{ return AdditionOperatorPatternAction(); }
 "-"											{ return SubtractionOperatorPatternAction(); }
 "*"											{ return MultiplicationOperatorPatternAction(); }
@@ -84,19 +91,14 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 "in"                                        { return InPatternAction();}
 
 "<"                                         { return LessThanPatternAction(); }
-">"                                        { return GreaterThanPatternAction(); }
-"="                                        { return EqualPatternAction(); }
-"!="                                       { return NotEqualPatternAction(); }
-"<="                                      { return LessThanOrEqualPatternAction(); }
-">="                                     { return GreaterThanOrEqualPatternAction(); }
-"=="                                    { return EqualEqualPatternAction(); }
+">"                                         { return GreaterThanPatternAction(); }
+"="                                         { return EqualPatternAction(); }
+"!="                                        { return NotEqualPatternAction(); }
+"<="                                        { return LessThanOrEqualPatternAction(); }
+">="                                        { return GreaterThanOrEqualPatternAction(); }
+"=="                                        { return EqualEqualPatternAction(); }
 
-"++"                                        { return IncrementPatternAction(); }
-"--"                                        { return DecrementPatternAction(); }
-"+="                                        { return PlusEqualPatternAction(); }
-"-="                                        { return MinusEqualPatternAction(); }
-"*="                                        { return MulEqualPatternAction(); }
-"/="                                        {return SlashEqualPatternAction();}
+
 
 "!"{var}                                    { return NegationPatternAction(yytext,yyleng); }
 "NOT"                                       { return NotPatternAction();}

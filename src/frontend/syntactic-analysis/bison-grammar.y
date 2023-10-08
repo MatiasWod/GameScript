@@ -144,6 +144,9 @@
 %type <token> parameters
 %type <token> function_assignment
 %type <token> gconstant
+%type <token> assignment
+%type <token> if_options
+
 
 // Reglas de asociatividad y precedencia (de menor a mayor).
 %left ADD SUB
@@ -193,18 +196,25 @@ parameters: %empty 													{ $$ = 0 /* EmptyParametersGrammarAction() */ ; 
 
 body: %empty														{ $$ = 0 /* EmptyBodyGrammarAction() */ ; } 
 	| conditionals body													{ $$ = 0 /* ConditionalsBodyGrammarAction($1, $2) */ ; }
-	| mathexp SEMICOLON body												{ $$ = 0 /* MathexpBodyGrammarAction($1, $3) */ ; }
+ /*	| mathexp SEMICOLON body												{ $$ = 0 /* MathexpBodyGrammarAction($1, $3)  ; } */
 	| VARNAME function_assignment SEMICOLON body									{ $$ = 0 /* BodyGrammarAction($1, $2, $3) */ ; }
-	| THIS array EQUAL constant SEMICOLON	body																{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
-	| type VARNAME array EQUAL constant SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }	
+	| THIS array assignment constant SEMICOLON	body																{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
+	| type VARNAME array assignment constant SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }	
 	| type VARNAME array SEMICOLON body										{ $$ = 0 /* BodyGrammarAction($1, $2, $4); */ ; }
-	| type VARNAME array EQUAL STRING_TEXT SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
-	| VARNAME array EQUAL constant SEMICOLON body								{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
+	| type VARNAME array assignment STRING_TEXT SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
+	| VARNAME array assignment constant SEMICOLON body								{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
 	| RETURN returnValue SEMICOLON											{ $$ = 0 /* BodyGrammarAction($1, $2, $4); */ ; }
-	| VARNAME array EQUAL functionvalue SEMICOLON body								{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
-	| type VARNAME array EQUAL functionvalue SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
+	| VARNAME array assignment functionvalue SEMICOLON body								{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
+	| type VARNAME array assignment functionvalue SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
 	;
 
+
+assignment: EQUAL 												{ $$ = 0 /* AssignmentGrammarAction($1, $2) */ ; }
+	| PLUS_EQUAL 														{ $$ = 0 /* AssignmentGrammarAction($1, $2) */ ; }
+	| MINUS_EQUAL 														{ $$ = 0 /* AssignmentGrammarAction($1, $2) */ ; }
+	| SLASH_EQUAL 														{ $$ = 0 /* AssignmentGrammarAction($1, $2) */ ; }
+	| MUL_EQUAL 														{ $$ = 0 /* AssignmentGrammarAction($1, $2) */ ; }
+	;
 function_assignment: OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS { $$ = 0 /* FunctionAssignmentGrammarAction($1, $3, $6) */ ; }
 	;
 
@@ -231,8 +241,16 @@ functionvalue: VARNAME OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS	{ $$ = 0 /*
 
 // var word OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE
 // CONST value
-conditionals: IF OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS			{ $$ = ConditionalsGrammarAction(); }
-	| WHEN OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE		{ $$ = 0 /* WhenBodyGrammarAction($3, $5) */ ; }
+conditionals:  WHEN OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE		{ $$ = 0 /* WhenBodyGrammarAction($3, $5) */ ; }
+	| WHEN OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE ELSE OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* WhenElseBodyGrammarAction($3, $5, $9) */ ; }
+	| IF OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	if_options	{ $$ = 0 /* IfBodyGrammarAction($3, $5) */ ; }
+	| FOR OPEN_PARENTHESIS INT VARNAME EQUAL INTEGER SEMICOLON boolean SEMICOLON VARNAME mathexp CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* ForBodyGrammarAction($3, $5, $7, $9, $11, $14) */ ; }
+	| WHILE OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE			{ $$ = 0 /* WhileBodyGrammarAction($3, $5) */ ; }
+	;
+
+if_options: %empty													{ $$ = 0 /* EmptyIfOptionsGrammarAction() */ ; }
+	| ELIF OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE if_options { $$ = 0 /* ElifBodyGrammarAction($3, $5, $7) */ ; }
+	| ELSE OPEN_BRACE body CLOSE_BRACE										{ $$ = 0 /* ElseBodyGrammarAction($3) */ ; }
 	;
 
 //	(1 < 2) integer[left] MINOR integer[right]
