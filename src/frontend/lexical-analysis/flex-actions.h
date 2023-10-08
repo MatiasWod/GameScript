@@ -118,6 +118,6 @@ token RightPatternAction();
 token LeftPatternAction();
 token SpacePatternAction();
 token EnterPatternAction();
-
+token OnclickPatternAction();
 
 #endif

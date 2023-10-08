@@ -122,11 +122,11 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 
 
  /* {letter}{var}*                              { return VarPatternAction(yytext,yyleng);} */
-"\""                                        { BEGIN(STRING);  BeginStringPatternAction();  }
+"\""                                        { BEGIN(STRING);  return QuotePatternAction();  }
 <STRING>{allcharacters}+								    { return StringTextPatternAction(yytext,yyleng); /*todo*/ }
-<STRING>"\""								{  EndStringPatternAction();  BEGIN(INITIAL); }
+<STRING>"\""								{  BEGIN(INITIAL); return QuotePatternAction();   }
 <STRING>.								{ IgnoredPatternAction(yytext, yyleng); /*todo*/ }
-
+"return"                                    { return ReturnPatternAction(); }
 "\'"{letter}"\'"                            { return CharTextPatternAction(yytext,yyleng); }
 
 "RGB"                                       {return RgbPatternAction();}
@@ -137,7 +137,7 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 {whitespace}+								{ IgnoredPatternAction(yytext, yyleng); }
 
 "#DEFINE"                                      { return ConstPatternAction(); }
-
+"onClick"                                   { return OnclickPatternAction(); }
 "STDIN"                                     { return StdinPatternAction(); }
 "STDOUT"                                    { return StdoutPatternAction(); }
 
@@ -164,7 +164,7 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 "null"                                 { return NullPatternAction(); }
 
 
-"return"                                    { return ReturnPatternAction(); }
+
 {letter}{var}+									{ return VarnamePatternAction(yytext, yyleng); }
 
 .											{ return UnknownPatternAction(yytext, yyleng); }

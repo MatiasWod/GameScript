@@ -540,7 +540,7 @@ token VarnamePatternAction(const char * lexeme, const int length) {
 }
 
 token StringTextPatternAction(const char * lexeme, const int length) {
-	LogDebug("StringPatternAction: '%s' (length = %d).", lexeme, length);
+	LogDebug("StringTextPatternAction: '%s' (length = %d).", lexeme, length);
 	char * string = (char *) calloc(length + 1, sizeof(char));
 	strncpy(string, lexeme, length);
 	yylval.string = string;
@@ -634,4 +634,16 @@ token EnterPatternAction(){
 	LogDebug("[Flex] EnterPatternAction: 'enter'.");
 	yylval.token = ENTER;
 	return ENTER;
+}
+
+token QuotePatternAction() {
+	LogDebug("[Flex] QuotePatternAction: '\"'.");
+	yylval.token = QUOTE;
+	return QUOTE;
+}
+
+token OnclickPatternAction() {
+	LogDebug("[Flex] OnClickPatternAction: 'onclick'.");
+	yylval.token = ONCLICK;
+	return ONCLICK;
 }
