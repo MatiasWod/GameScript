@@ -553,3 +553,85 @@ token ArrayPatternAction(const char * lexeme, const int length)
 	yylval.token = ARRAY;
 	return ARRAY;
 }
+
+/*token FunctionPatternAction(const char * lexeme, const int length)
+{
+	LogDebug("[Flex] FunctionPatternAction: 'function'.");
+	yylval.token = FUNCTION;
+	return FUNCTION;
+}*/
+
+token CharTextPatternAction(const char * lexeme, const int length)
+{
+	LogDebug("[Flex] CharTextPatternAction: '%s' (length = %d).", lexeme, length);
+	char * charText = (char *) calloc(length + 1, sizeof(char));
+	strncpy(charText, lexeme, length);
+	yylval.string = charText;
+	return CHAR_TEXT;
+}
+
+token NokeyPatternAction(){
+	LogDebug("[Flex] NokeyPatternAction: 'nokey'.");
+	yylval.token = NOKEY;
+	return NOKEY;
+}
+
+token UpBorderPatternAction(){
+	LogDebug("[Flex] UpBorderPatternAction: 'upborder'.");
+	yylval.token = UP_BORDER;
+	return UP_BORDER;
+}
+
+token DownBorderPatternAction(){
+	LogDebug("[Flex] DownBorderPatternAction: 'downborder'.");	
+	yylval.token = DOWN_BORDER;
+	return DOWN_BORDER;
+}
+
+token RightBorderPatternAction(){
+	LogDebug("[Flex] RightBorderPatternAction: 'rightborder'.");
+	yylval.token = RIGHT_BORDER;
+	return RIGHT_BORDER;
+}
+
+token LeftBorderPatternAction(){
+	LogDebug("[Flex] LeftBorderPatternAction: 'leftborder'.");
+	yylval.token = LEFT_BORDER;
+	return LEFT_BORDER;
+}
+
+token UpPatternAction(){
+	LogDebug("[Flex] UpPatternAction: 'up'.");
+	yylval.token = UP;
+	return UP;
+}
+
+token DownPatternAction(){
+	LogDebug("[Flex] DownPatternAction: 'down'.");
+	yylval.token = DOWN;
+	return DOWN;
+}
+
+token RightPatternAction(){
+	LogDebug("[Flex] RightPatternAction: 'right'.");
+	yylval.token = RIGHT;
+	return RIGHT;
+}
+
+token LeftPatternAction(){
+	LogDebug("[Flex] LeftPatternAction: 'left'.");
+	yylval.token = LEFT;
+	return LEFT;
+}
+
+token SpacePatternAction(){
+	LogDebug("[Flex] SpacePatternAction: 'space'.");
+	yylval.token = SPACE;
+	return SPACE;
+}
+
+token EnterPatternAction(){
+	LogDebug("[Flex] EnterPatternAction: 'enter'.");
+	yylval.token = ENTER;
+	return ENTER;
+}

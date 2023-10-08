@@ -103,12 +103,26 @@
 %token <token> IF
 %token <token> RETURN
 %token <token> VARNAME
+// %token <token> FUNCTION
 
 // %token <token> NAME
 %token <character> CHAR
 %token <string> STRING_TEXT
 %token <integer> INTEGER
 %token <token> ARRAY
+%token <token> CHAR_TEXT
+
+%token <token> NOKEY
+%token <token> UP_BORDER
+%token <token> DOWN_BORDER
+%token <token> LEFT_BORDER
+%token <token> RIGHT_BORDER
+%token <token> UP
+%token <token> DOWN
+%token <token> LEFT
+%token <token> RIGHT
+%token <token> SPACE
+%token <token> ENTER
 // Tipos de dato para los no-terminales generados desde Bison.
 %type <program> program
 %type <expression> expression
@@ -129,6 +143,7 @@
 %type <token> main_scene
 %type <token> parameters
 %type <token> function_assignment
+%type <token> gconstant
 
 // Reglas de asociatividad y precedencia (de menor a mayor).
 %left ADD SUB
@@ -177,17 +192,20 @@ parameters: %empty 													{ $$ = 0 /* EmptyParametersGrammarAction() */ ; 
 	;
 
 body: %empty														{ $$ = 0 /* EmptyBodyGrammarAction() */ ; } 
+	| conditionals body													{ $$ = 0 /* ConditionalsBodyGrammarAction($1, $2) */ ; }
+	| mathexp SEMICOLON body												{ $$ = 0 /* MathexpBodyGrammarAction($1, $3) */ ; }
+	| VARNAME function_assignment SEMICOLON body									{ $$ = 0 /* BodyGrammarAction($1, $2, $3) */ ; }
 	| THIS array EQUAL constant SEMICOLON	body																{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
 	| type VARNAME array EQUAL constant SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }	
 	| type VARNAME array SEMICOLON body										{ $$ = 0 /* BodyGrammarAction($1, $2, $4); */ ; }
 	| type VARNAME array EQUAL STRING_TEXT SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
 	| VARNAME array EQUAL constant SEMICOLON body								{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
 	| RETURN returnValue SEMICOLON											{ $$ = 0 /* BodyGrammarAction($1, $2, $4); */ ; }
-	| VARNAME array EQUAL function_assignment SEMICOLON body								{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
-	| type VARNAME array EQUAL function_assignment SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
+	| VARNAME array EQUAL functionvalue SEMICOLON body								{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
+	| type VARNAME array EQUAL functionvalue SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
 	;
 
-function_assignment: VARNAME OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* FunctionAssignmentGrammarAction($1, $3, $6) */ ; }
+function_assignment: OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS { $$ = 0 /* FunctionAssignmentGrammarAction($1, $3, $6) */ ; }
 	;
 
 array: %empty 														{ $$ = 0 /* EmptyArrayGrammarAction() */ ; }
@@ -200,6 +218,8 @@ returnValue: constant													{ $$ = 0 /* ReturnValueGrammarAction($1); */ ;
 	| INTEGER															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
 	| STRING_TEXT														{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
 	| THIS                                                              { $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
+	| CHAR_TEXT														 { $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
+	| gconstant															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
 	;
 
 value: type 														{ $$ = 0 /* TypeValueGrammarAction($1);  */ ; }
@@ -212,6 +232,7 @@ functionvalue: VARNAME OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS	{ $$ = 0 /*
 // var word OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE
 // CONST value
 conditionals: IF OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS			{ $$ = ConditionalsGrammarAction(); }
+	| WHEN OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE		{ $$ = 0 /* WhenBodyGrammarAction($3, $5) */ ; }
 	;
 
 //	(1 < 2) integer[left] MINOR integer[right]
@@ -228,6 +249,7 @@ boolean: mathexp[left] LESS_THAN mathexp[right]						{ $$ = 0 ; /* MinorBooleanG
 	| mathexp[left] GREATER_THAN_OR_EQUAL mathexp[right]						{ $$ = 0; /* MajorEqualBooleanGrammarAction($left, $right); */ }
 	| mathexp[left] EQUAL_EQUAL mathexp[right]							{ $$ =  EqualBooleanGrammarAction($left, $right);  }
 	| mathexp[left] NOT_EQUAL mathexp[right]						{ $$ = 0; /* NotEqualBooleanGrammarAction($left, $right); */ }
+	| VARNAME IN VARNAME													{ $$ = 0; /* InBooleanGrammarAction($3); */ }
 	| conditionals													{ $$ = 0; /* ConditionalsBooleanGrammarAction($1); */ }
 	;
 
@@ -235,6 +257,10 @@ boolean: mathexp[left] LESS_THAN mathexp[right]						{ $$ = 0 ; /* MinorBooleanG
 mathexp: mathexp[left] SUB mathexp[right]						{ $$ = SubtractionExpressionGrammarAction($left, $right); }
 		| mathexp[left] MUL mathexp[right]						{ $$ = MultiplicationExpressionGrammarAction($left, $right); }
 		| mathexp[left] DIV mathexp[right]						{ $$ = DivisionExpressionGrammarAction($left, $right); }
+		| MUL_EQUAL mathexp[right]					{ $$ = 0; /* MulEqualExpressionGrammarAction($2, $3); */ }
+		| SLASH_EQUAL mathexp[right]					{ $$ = 0; /* SlashEqualExpressionGrammarAction($2, $3); */ }
+		| PLUS_EQUAL mathexp[right]					{ $$ = 0; /* PlusEqualExpressionGrammarAction($2, $3); */ }
+		| MINUS_EQUAL mathexp[right]					{ $$ = 0; /* MinusEqualExpressionGrammarAction($2, $3); */ }
 		| factor														{ $$ = FactorExpressionGrammarAction($1); }
 	;
 
@@ -246,5 +272,16 @@ constant: INTEGER													{ $$ = IntegerConstantGrammarAction($1); }
 	|	VARNAME														{ $$ = 0 /* VarnameConstantGrammarAction($1); */ ; }
 	;
 
-
+gconstant: UP_BORDER 												{ $$ = 0 /* UpBorderConstantGrammarAction(); */ ; }
+	| DOWN_BORDER													{ $$ = 0 /* DownBorderConstantGrammarAction(); */ ; }
+	| LEFT_BORDER													{ $$ = 0 /* LeftBorderConstantGrammarAction(); */ ; }
+	| RIGHT_BORDER													{ $$ = 0 /* RightBorderConstantGrammarAction(); */ ; }
+	| UP															{ $$ = 0 /* UpConstantGrammarAction(); */ ; }
+	| DOWN															{ $$ = 0 /* DownConstantGrammarAction(); */ ; }
+	| LEFT															{ $$ = 0 /* LeftConstantGrammarAction(); */ ; }
+	| RIGHT															{ $$ = 0 /* RightConstantGrammarAction(); */ ; }
+	| SPACE															{ $$ = 0 /* SpaceConstantGrammarAction(); */ ; }
+	| ENTER															{ $$ = 0 /* EnterConstantGrammarAction(); */ ; }
+	| NOKEY															{ $$ = 0 /* NokeyConstantGrammarAction(); */ ; }
+	;
 %%

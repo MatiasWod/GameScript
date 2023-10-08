@@ -31,7 +31,11 @@ justspace       [ \t\v]
 letter          [a-zA-Z]
 var             [a-zA-Z0-9_]
 allcharacters  [a-zA-Z0-9_ \t\v]
-optionalThis    ["."{letter}{var}+]
+optionalThis    "."[{letter}{var}+]
+char           '{letter}'
+string          "{letter}{var}+"
+ // params allow to have string, char or {letter}{var}+ for example (0, "hola", 'a', var1, var2, var3)
+params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{var}+))*
 /* condition     "("({var}(!{justspace}+)?("|!="{justspace}+"{var}"{justspace}*")"({justspace}+"{var})?")" */
 
 %%
@@ -101,12 +105,27 @@ optionalThis    ["."{letter}{var}+]
 "and"                                       { return AndPatternAction();}
 "OR"                                        { return OrPatternAction();}        
 "or"                                        { return OrPatternAction();}
+
+"NOKEY"                                    { return NokeyPatternAction(); }
+"UP_BORDER"                             { return UpBorderPatternAction(); }
+"DOWN_BORDER"                           { return DownBorderPatternAction(); }
+"RIGHT_BORDER"                          { return RightBorderPatternAction(); }
+"LEFT_BORDER"                           { return LeftBorderPatternAction(); }
+"UP"                                      { return UpPatternAction(); }
+"DOWN"                                   { return DownPatternAction(); }
+"RIGHT"                                  { return RightPatternAction(); }
+"LEFT"                                   { return LeftPatternAction(); }
+"SPACE"                                  { return SpacePatternAction(); }
+"ENTER"                                  { return EnterPatternAction(); }
+
+
  /* {letter}{var}*                              { return VarPatternAction(yytext,yyleng);} */
 "\""                                        { BEGIN(STRING);  BeginStringPatternAction();  }
 <STRING>{allcharacters}+								    { return StringTextPatternAction(yytext,yyleng); /*todo*/ }
 <STRING>"\""								{  EndStringPatternAction();  BEGIN(INITIAL); }
 <STRING>.								{ IgnoredPatternAction(yytext, yyleng); /*todo*/ }
 
+"\'"{letter}"\'"                            { return CharTextPatternAction(yytext,yyleng); }
 
 "RGB"                                       {return RgbPatternAction();}
 "px"                                        {return PxPatternAction();}
@@ -120,6 +139,14 @@ optionalThis    ["."{letter}{var}+]
 "STDIN"                                     { return StdinPatternAction(); }
 "STDOUT"                                    { return StdoutPatternAction(); }
 
+"this""."{letter}{var}+                                 { return ThisPatternAction(yytext, yyleng); }
+"this"                                { return ThisPatternAction(yytext, yyleng); }
+"THIS"{optionalThis}?                             { return ThisPatternAction(yytext, yyleng); }
+"mainScene"                                { return MainScenePatternAction(); }
+{letter}{var}+"."{letter}{var}+                   { return VarPatternAction(yytext, yyleng); }
+{letter}{var}+                                    { return VarPatternAction(yytext, yyleng); }
+ /* {letter}{var}+"."{letter}{var}+"("{params}")"      { return FunctionPatternAction(yytext, yyleng); } */
+
 ";"                                        { return SemicolonPatternAction(); }
 ","                                       { return CommaPatternAction(); }
 "."                                     { return DotPatternAction(); }
@@ -130,13 +157,11 @@ optionalThis    ["."{letter}{var}+]
 "false"                                    { return FalsePatternAction(); }
 "FALSE"                                   { return FalsePatternAction(); }
 
-"this"{optionalThis}?                                 { return ThisPatternAction(yytext, yyleng); }
-"THIS"{optionalThis}?                             { return ThisPatternAction(yytext, yyleng); }
-{letter}{var}+"."{letter}{var}+                                  { return VarPatternAction(yytext, yyleng); }
+
 "NULL"                                 { return NullPatternAction(); }
 "null"                                 { return NullPatternAction(); }
 
-"mainScene"                                { return MainScenePatternAction(); }
+
 "return"                                    { return ReturnPatternAction(); }
 {letter}{var}+									{ return VarnamePatternAction(yytext, yyleng); }
 

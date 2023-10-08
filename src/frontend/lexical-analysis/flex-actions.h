@@ -99,9 +99,25 @@ token NullPatternAction();
 token MainScenePatternAction();
 token ReturnPatternAction();
 token VarPatternAction(const char *lexeme, const int length);
+token FunctionPatternAction(const char * lexeme, const int length);
 
 void BeginStringPatternAction();
 void EndStringPatternAction();
 token StringTextPatternAction(const char * lexeme, const int length);
 token ArrayPatternAction(const char * lexeme, const int length);
+token CharTextPatternAction(const char * lexeme, const int length);
+
+token NokeyPatternAction();
+token UpBorderPatternAction();
+token DownBorderPatternAction();
+token RightBorderPatternAction();
+token LeftBorderPatternAction();
+token UpPatternAction();
+token DownPatternAction();
+token RightPatternAction();
+token LeftPatternAction();
+token SpacePatternAction();
+token EnterPatternAction();
+
+
 #endif
