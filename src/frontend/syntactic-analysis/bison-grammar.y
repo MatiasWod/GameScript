@@ -152,8 +152,16 @@
 
 
 // Reglas de asociatividad y precedencia (de menor a mayor).
-%left ADD SUB
-%left MUL DIV
+%left  INCREMENT DECREMENT
+%left  ADD SUB
+%left  MUL DIV
+%left  LESS_THAN GREATER_THAN LESS_THAN_OR_EQUAL GREATER_THAN_OR_EQUAL
+%left  EQUAL_EQUAL NOT_EQUAL
+%left  AND
+%left  OR
+%right EQUAL PLUS_EQUAL MINUS_EQUAL MUL_EQUAL SLASH_EQUAL
+%left  COMMA
+
 
 // El símbolo inicial de la gramatica.
 %start program
