@@ -163,7 +163,7 @@
 program: main_scene													{ $$ = ProgramGrammarAction($1) ; }
 	;
 
-main_scene: type MAIN_SCENE OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE expression	{ $$ = 0 /* MainSceneGrammarAction($1, $4, $7) */ ; }
+main_scene: SCENE MAIN_SCENE OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE expression	{ $$ = 0 /* MainSceneGrammarAction($1, $4, $7) */ ; }
 	;
 expression: %empty 												{ $$ = 0 /* EmptyExpressionGrammarAction() */ ; }
 	| function expression 						{ $$ = 0 /* FunctionExpressionGrammarAction($1); */ ; }
@@ -299,8 +299,9 @@ factor: OPEN_PARENTHESIS expression CLOSE_PARENTHESIS				{ $$ = ExpressionFactor
 
 constant: INTEGER													{ $$ = IntegerConstantGrammarAction($1); }
 	|	VARNAME														{ $$ = 0 /* VarnameConstantGrammarAction($1); */ ; }
-	| SUB INTEGER 												{ $$ = 0 /* SubstractIntegerConstantGrammarAction($1, $2); */ ; }
-	| INTEGER PX 					{ $$ = 0 /* IntegerPxConstantGrammarAction($1, $2); */ ; }
+	| SUB INTEGER 													{ $$ = 0 /* SubstractIntegerConstantGrammarAction($1, $2); */ ; }
+	| INTEGER PX 													{ $$ = 0 /* IntegerPxConstantGrammarAction($1, $2); */ ; }
+	| QUOTE STRING_TEXT QUOTE 										{ $$ = 0 /* StringConstantGrammarAction($2); */ ; }
 	;
 
 gconstant: UP_BORDER 												{ $$ = 0 /* UpBorderConstantGrammarAction(); */ ; }
