@@ -324,6 +324,13 @@ token InPatternAction()
 	return IN;
 }
 
+token HitsPatternAction()
+{
+	LogDebug("[Flex] HitsPatternAction: 'hits'.");
+	yylval.token = HITS;
+	return HITS;
+}
+
 token IncrementPatternAction()
 {
 	LogDebug("[Flex] IncrementPatternAction: '++'.");

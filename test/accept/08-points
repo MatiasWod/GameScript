@@ -1,0 +1,49 @@
+scene mainScene() {
+   int playerScore = 0;
+   int targetScore = 50; // Set the target score needed to win
+   
+   gobject player = Player(1);
+   player.setMovement('w', 's', 'a', 'd');
+   player.setLocation(5, 5);
+   
+   // Create collectible items with different point values
+   gobject item1 = CollectibleItem("Item 1", 10);
+   item1.setLocation(2, 2);
+   
+   gobject item2 = CollectibleItem("Item 2", 20);
+   item2.setLocation(8, 8);
+   
+   when (player hits item1) {
+       playerScore += item1.pointValue; // Increase player's score
+       item1.setLocation(-1, -1); // Remove the item from the scene
+   }
+   
+   when (player hits item2) {
+       playerScore += item2.pointValue; // Increase player's score
+       item2.setLocation(-1, -1); // Remove the item from the scene
+   }
+   
+   // Check if the player has reached the target score
+   if (playerScore >= targetScore) {
+       load(winScene, "You win!"); // Transition to the win scene
+   }
+   
+   // Other game logic and objects can be added here
+}
+
+gobject Player(int speed) {
+   block hitbox[3][1];
+   this.speed = speed;
+   return this;
+}
+
+gobject CollectibleItem(string name, int pointValue) {
+   this.name = name;
+   this.pointValue = pointValue;
+   return this;
+}
+
+scene winScene(string message) {
+   // Display a message when the player wins
+   // You can define scene content and actions here
+}

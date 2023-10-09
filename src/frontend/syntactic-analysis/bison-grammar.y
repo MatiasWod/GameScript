@@ -68,6 +68,7 @@
 %token <token> ELIF
 %token <token> ELSE
 %token <token> IN
+%token <token> HITS
 %token <token> INCREMENT
 %token <token> DECREMENT
 %token <token> PLUS_EQUAL
@@ -153,8 +154,16 @@
 
 
 // Reglas de asociatividad y precedencia (de menor a mayor).
-%left ADD SUB
-%left MUL DIV
+%left  INCREMENT DECREMENT
+%left  ADD SUB
+%left  MUL DIV
+%left  LESS_THAN GREATER_THAN LESS_THAN_OR_EQUAL GREATER_THAN_OR_EQUAL
+%left  EQUAL_EQUAL NOT_EQUAL
+%left  AND
+%left  OR
+%right EQUAL PLUS_EQUAL MINUS_EQUAL MUL_EQUAL SLASH_EQUAL
+%left  COMMA
+
 
 // El símbolo inicial de la gramatica.
 %start program
@@ -190,7 +199,7 @@ type: INT															{ $$ = 0 /* IntTypeGrammarAction(); */ ; }
 
 parameters_def: %empty													{ $$ = 0 /* EmptyParametersGrammarAction() */ ; }
 	| type VARNAME														{ $$ = 0 /* ParametersGrammarAction($1, $2) */ ; }
-	| type VARNAME COMMA parameters									{ $$ = 0 /* ParametersGrammarAction($1, $2, $4) */ ; }
+	| type VARNAME COMMA parameters_def									{ $$ = 0 /* ParametersGrammarAction($1, $2, $4) */ ; }
 	;
 
 parameters: %empty 													{ $$ = 0 /* EmptyParametersGrammarAction() */ ; }
@@ -301,6 +310,8 @@ boolean: mathexp[left] LESS_THAN mathexp[right]						{ $$ = 0 ; /* MinorBooleanG
 	| VARNAME IN gconstant 												{ $$ = 0; /* InBooleanGrammarAction($3); */ }
 	| VARNAME                   				   { $$ = 0; /* VarnameBooleanGrammarAction($1); */ }
 	| VARNAME function_assignment 				   { $$ = 0; /* VarnameBooleanGrammarAction($1); */ }
+	| VARNAME HITS VARNAME													{ $$ = 0; /* InBooleanGrammarAction($3); */ }
+	| VARNAME HITS gconstant 												{ $$ = 0; /* InBooleanGrammarAction($3); */ }
 	| conditionals													{ $$ = 0; /* ConditionalsBooleanGrammarAction($1); */ }
 	;
 
