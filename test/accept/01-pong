@@ -16,7 +16,7 @@ scene mainScene() {
   gobject ball = Ball(3);
   ball.setLocation(5, 5);
   when (ball in Player){
-      ball.direction *= 1;
+      ball.direction *= -1;
   }
   when (ball in rightBorder){
      team1Score++;

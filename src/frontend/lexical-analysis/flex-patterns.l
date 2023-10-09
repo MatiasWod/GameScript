@@ -141,12 +141,12 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 "STDIN"                                     { return StdinPatternAction(); }
 "STDOUT"                                    { return StdoutPatternAction(); }
 
-"this""."{letter}{var}+                                 { return ThisPatternAction(yytext, yyleng); }
+"this""."{letter}{var}*                                 { return ThisPatternAction(yytext, yyleng); }
 "this"                                { return ThisPatternAction(yytext, yyleng); }
 "THIS"{optionalThis}?                             { return ThisPatternAction(yytext, yyleng); }
 "mainScene"                                { return MainScenePatternAction(); }
-{letter}{var}+"."{letter}{var}+                   { return VarPatternAction(yytext, yyleng); }
-{letter}{var}+                                    { return VarPatternAction(yytext, yyleng); }
+{letter}{var}*"."{letter}{var}*                   { return VarPatternAction(yytext, yyleng); }
+{letter}{var}*                                    { return VarPatternAction(yytext, yyleng); }
  /* {letter}{var}+"."{letter}{var}+"("{params}")"      { return FunctionPatternAction(yytext, yyleng); } */
 
 ";"                                        { return SemicolonPatternAction(); }
@@ -165,7 +165,7 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 
 
 
-{letter}{var}+									{ return VarnamePatternAction(yytext, yyleng); }
+{letter}{var}*									{ return VarnamePatternAction(yytext, yyleng); }
 
 .											{ return UnknownPatternAction(yytext, yyleng); }
 

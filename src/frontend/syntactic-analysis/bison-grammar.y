@@ -149,6 +149,7 @@
 %type <token> assignment
 %type <token> if_options
 %type <token> varsingleaction
+%type <token> for_options
 
 
 // Reglas de asociatividad y precedencia (de menor a mayor).
@@ -199,9 +200,11 @@ parameters: %empty 													{ $$ = 0 /* EmptyParametersGrammarAction() */ ; 
 
 body: %empty														{ $$ = 0 /* EmptyBodyGrammarAction() */ ; } 
 	| conditionals body													{ $$ = 0 /* ConditionalsBodyGrammarAction($1, $2) */ ; }
- 	| mathexp SEMICOLON body												{ $$ = 0 /* MathexpBodyGrammarAction($1, $3) */  ; } 
 	| VARNAME function_assignment SEMICOLON body									{ $$ = 0 /* BodyGrammarAction($1, $2, $3) */ ; }
 	| THIS array assignment returnValue SEMICOLON	body																{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
+	| THIS array assignment functionvalue SEMICOLON body								{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
+	| functionvalue SEMICOLON body											{ $$ = 0 /* BodyGrammarAction($1, $2) */ ; }
+	| THIS array functionvalue SEMICOLON body 									{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
 	| type VARNAME array assignment constant SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }	
 	| type VARNAME array SEMICOLON body										{ $$ = 0 /* BodyGrammarAction($1, $2, $4); */ ; }
 	| type VARNAME array assignment STRING_TEXT SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
@@ -227,6 +230,7 @@ function_assignment: OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS { $$ = 0 /* F
 	;
 
 array: %empty 														{ $$ = 0 /* EmptyArrayGrammarAction() */ ; }
+	| OPEN_BRACKET VARNAME CLOSE_BRACKET array										{ $$ = 0 /* ArrayGrammarAction($2) */ ; }
 	| OPEN_BRACKET INTEGER CLOSE_BRACKET array								{ $$ = 0 /* ArrayGrammarAction($2) */ ; }
 	| OPEN_BRACKET CLOSE_BRACKET array										{ $$ = 0 /* ArrayGrammarAction() */ ; }
 	;
@@ -238,6 +242,12 @@ returnValue: constant													{ $$ = 0 /* ReturnValueGrammarAction($1); */ ;
 	| THIS                                                              { $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
 	| CHAR_TEXT														 { $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
 	| gconstant															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
+	| THIS VARNAME array													{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
+	| THIS functionvalue											{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
+	| constant SUB constant 															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
+	| constant ADD constant 															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
+	| constant MUL constant 															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
+	| constant DIV constant 															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
 	;
 
 value: type 														{ $$ = 0 /* TypeValueGrammarAction($1);  */ ; }
@@ -252,8 +262,18 @@ functionvalue: VARNAME OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS	{ $$ = 0 /*
 conditionals:  WHEN OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE		{ $$ = 0 /* WhenBodyGrammarAction($3, $5) */ ; }
 	| WHEN OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE ELSE OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* WhenElseBodyGrammarAction($3, $5, $9) */ ; }
 	| IF OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	if_options	{ $$ = 0 /* IfBodyGrammarAction($3, $5) */ ; }
-	| FOR OPEN_PARENTHESIS INT VARNAME EQUAL INTEGER SEMICOLON boolean SEMICOLON VARNAME mathexp CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* ForBodyGrammarAction($3, $5, $7, $9, $11, $14) */ ; }
+	| FOR OPEN_PARENTHESIS INT VARNAME EQUAL INTEGER SEMICOLON boolean SEMICOLON for_options CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* ForBodyGrammarAction($3, $5, $7, $9, $11, $14) */ ; }
 	| WHILE OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE			{ $$ = 0 /* WhileBodyGrammarAction($3, $5) */ ; }
+	;
+
+for_options: %empty													{ $$ = 0 /* EmptyForOptionsGrammarAction() */ ; }
+	| VARNAME INCREMENT														{ $$ = 0 /* ForOptionsGrammarAction($1) */ ; }
+	| VARNAME DECREMENT														{ $$ = 0 /* ForOptionsGrammarAction($1) */ ; }
+	| VARNAME PLUS_EQUAL INTEGER													{ $$ = 0 /* ForOptionsGrammarAction($1, $3) */ ; }
+	| VARNAME MINUS_EQUAL INTEGER													{ $$ = 0 /* ForOptionsGrammarAction($1, $3) */ ; }
+	| VARNAME SLASH_EQUAL INTEGER													{ $$ = 0 /* ForOptionsGrammarAction($1, $3) */ ; }
+	| VARNAME MUL_EQUAL INTEGER													{ $$ = 0 /* ForOptionsGrammarAction($1, $3) */ ; }
+	| VARNAME EQUAL mathexp														{ $$ = 0 /* ForOptionsGrammarAction($1, $3) */ ; }
 	;
 
 if_options: %empty													{ $$ = 0 /* EmptyIfOptionsGrammarAction() */ ; }
@@ -279,6 +299,8 @@ boolean: mathexp[left] LESS_THAN mathexp[right]						{ $$ = 0 ; /* MinorBooleanG
 	| boolean AND boolean												{ $$ = 0; /* OrBooleanGrammarAction($1, $3); */ }
 	| VARNAME IN VARNAME													{ $$ = 0; /* InBooleanGrammarAction($3); */ }
 	| VARNAME IN gconstant 												{ $$ = 0; /* InBooleanGrammarAction($3); */ }
+	| VARNAME                   				   { $$ = 0; /* VarnameBooleanGrammarAction($1); */ }
+	| VARNAME function_assignment 				   { $$ = 0; /* VarnameBooleanGrammarAction($1); */ }
 	| conditionals													{ $$ = 0; /* ConditionalsBooleanGrammarAction($1); */ }
 	;
 
@@ -286,19 +308,16 @@ boolean: mathexp[left] LESS_THAN mathexp[right]						{ $$ = 0 ; /* MinorBooleanG
 mathexp: mathexp[left] SUB mathexp[right]						{ $$ = SubtractionExpressionGrammarAction($left, $right); }
 		| mathexp[left] MUL mathexp[right]						{ $$ = MultiplicationExpressionGrammarAction($left, $right); }
 		| mathexp[left] DIV mathexp[right]						{ $$ = DivisionExpressionGrammarAction($left, $right); }
-		| MUL_EQUAL mathexp[right]					{ $$ = 0; /* MulEqualExpressionGrammarAction($2, $3); */ }
-		| SLASH_EQUAL mathexp[right]					{ $$ = 0; /* SlashEqualExpressionGrammarAction($2, $3); */ }
-		| PLUS_EQUAL mathexp[right]					{ $$ = 0; /* PlusEqualExpressionGrammarAction($2, $3); */ }
-		| MINUS_EQUAL mathexp[right]					{ $$ = 0; /* MinusEqualExpressionGrammarAction($2, $3); */ }
 		| factor														{ $$ = FactorExpressionGrammarAction($1); }
+		| mathexp[left] ADD mathexp[right]						{ $$ = AdditionExpressionGrammarAction($left, $right); }
 	;
 
-factor: OPEN_PARENTHESIS expression CLOSE_PARENTHESIS				{ $$ = ExpressionFactorGrammarAction($2); }
+factor: OPEN_PARENTHESIS mathexp CLOSE_PARENTHESIS				{ $$ = ExpressionFactorGrammarAction($2); }
 	| constant														{ $$ = ConstantFactorGrammarAction($1); }
 	;
 
 constant: INTEGER													{ $$ = IntegerConstantGrammarAction($1); }
-	|	VARNAME														{ $$ = 0 /* VarnameConstantGrammarAction($1); */ ; }
+	| VARNAME														{ $$ = 0 /* VarnameConstantGrammarAction($1); */ ; }
 	| SUB INTEGER 													{ $$ = 0 /* SubstractIntegerConstantGrammarAction($1, $2); */ ; }
 	| INTEGER PX 													{ $$ = 0 /* IntegerPxConstantGrammarAction($1, $2); */ ; }
 	| QUOTE STRING_TEXT QUOTE 										{ $$ = 0 /* StringConstantGrammarAction($2); */ ; }
