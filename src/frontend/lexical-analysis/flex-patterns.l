@@ -89,6 +89,7 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 "elif"                                      { return ElifPatternAction();}
 "else"                                      { return ElsePatternAction();}
 "in"                                        { return InPatternAction();}
+"hits"                                      { return HitsPatternAction();}
 
 "<"                                         { return LessThanPatternAction(); }
 ">"                                         { return GreaterThanPatternAction(); }

@@ -68,6 +68,7 @@ token WhilePatternAction();
 token ElifPatternAction();
 token ElsePatternAction();
 token InPatternAction();
+token HitsPatternAction();
 token IncrementPatternAction();
 token DecrementPatternAction();
 token PlusEqualPatternAction();

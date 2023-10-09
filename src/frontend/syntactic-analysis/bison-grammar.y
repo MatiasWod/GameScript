@@ -68,6 +68,7 @@
 %token <token> ELIF
 %token <token> ELSE
 %token <token> IN
+%token <token> HITS
 %token <token> INCREMENT
 %token <token> DECREMENT
 %token <token> PLUS_EQUAL
@@ -197,7 +198,7 @@ type: INT															{ $$ = 0 /* IntTypeGrammarAction(); */ ; }
 
 parameters_def: %empty													{ $$ = 0 /* EmptyParametersGrammarAction() */ ; }
 	| type VARNAME														{ $$ = 0 /* ParametersGrammarAction($1, $2) */ ; }
-	| type VARNAME COMMA parameters									{ $$ = 0 /* ParametersGrammarAction($1, $2, $4) */ ; }
+	| type VARNAME COMMA parameters_def									{ $$ = 0 /* ParametersGrammarAction($1, $2, $4) */ ; }
 	;
 
 parameters: %empty 													{ $$ = 0 /* EmptyParametersGrammarAction() */ ; }
@@ -287,6 +288,8 @@ boolean: mathexp[left] LESS_THAN mathexp[right]						{ $$ = 0 ; /* MinorBooleanG
 	| boolean AND boolean												{ $$ = 0; /* OrBooleanGrammarAction($1, $3); */ }
 	| VARNAME IN VARNAME													{ $$ = 0; /* InBooleanGrammarAction($3); */ }
 	| VARNAME IN gconstant 												{ $$ = 0; /* InBooleanGrammarAction($3); */ }
+	| VARNAME HITS VARNAME													{ $$ = 0; /* InBooleanGrammarAction($3); */ }
+	| VARNAME HITS gconstant 												{ $$ = 0; /* InBooleanGrammarAction($3); */ }
 	| conditionals													{ $$ = 0; /* ConditionalsBooleanGrammarAction($1); */ }
 	;
 
