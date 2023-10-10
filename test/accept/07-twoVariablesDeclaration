@@ -1,0 +1,4 @@
+scene mainScene(){
+    int num;
+    char name;
+}

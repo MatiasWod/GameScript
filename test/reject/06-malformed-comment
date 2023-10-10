@@ -1,0 +1,11 @@
+scene mainScene(){
+
+}
+
+gobject Ball(int speed) {
+   block hitbox[1][1]; 1 posición de ancho, 1 posición de altura
+   this.speed = speed;
+   this.movement = both /* el usuario podría definir solo movimiento horizontal/vertical
+   return this;
+}
+

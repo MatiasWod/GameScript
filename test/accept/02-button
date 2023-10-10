@@ -1,0 +1,20 @@
+scene mainScene(){
+    text title=gameTitle();
+    title.location(5,7);
+    button start=startButton();
+    start.location(5,5); 
+ }
+ 
+ button startButton(){
+  label="Start";
+  onClick(load(gameScene));
+ }
+ text gameTitle(){
+   label="Welcome to my game";
+   // Only accept sizes in px
+   font_size=10px;
+   // Only accept colors by RGB (0xFFFFFF) or name (if they exist within the library)
+   font_color=red;
+   // font-color=red
+ }
+ 

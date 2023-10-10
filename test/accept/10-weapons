@@ -1,0 +1,57 @@
+scene mainScene() {
+   int playerLife = 100;
+   int enemyLife = 50;
+   int playerScore = 0;
+   int enemyCount = 3;
+   
+   gobject player = Player(1);
+   player.setMovement('w', 's', 'a', 'd');
+   player.setLocation(5, 5);
+   
+   gobject weapon = Weapon("Sword", 20); // Create a sword with 20 damage points
+   
+   when (player hits enemy) {
+       enemyLife -= weapon.damage; // Reduce enemy's life based on weapon damage
+       if (enemyLife <= 0) {
+           playerScore += 10; // Increase player score for defeating an enemy
+           enemyCount--;
+           if (enemyCount <= 0) {
+               load(winScene, "You win!");
+           }
+       }
+   }
+   
+   when (player hits RIGHT_BORDER OR  player hits LEFT_BORDER OR player hits TOP_BORDER OR player hits BOTTOM_BORDER) {
+       playerLife -= 10; // Reduce player's life when hitting a border
+       if (playerLife <= 0) {
+           load(gameOverScene, "Game Over");
+       }
+   }
+   
+   when (enemy hits player) {
+       playerLife -= 15; // Reduce player's life when hit by an enemy
+       if (playerLife <= 0) {
+           load(gameOverScene, "Game Over");
+       }
+   }
+   
+   // Other game logic and objects can be added here
+}
+
+gobject Player(int speed) {
+   block hitbox[3][1];
+   this.speed = speed;
+   return this;
+}
+
+gobject Weapon(string name, int damage) {
+   this.name = name;
+   this.damage = damage;
+   return this;
+}
+
+gobject Enemy(int speed) {
+   block hitbox[3][1];
+   this.speed = speed;
+   return this;
+}

@@ -1,0 +1,7 @@
+scene mainScene(){
+    int num;
+}
+
+scene titleScene(){
+    title = "My game";
+}

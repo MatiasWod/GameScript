@@ -1,0 +1,63 @@
+scene mainScene() {
+   int team1Score=0;
+   int team2Score=0;
+   gobject p1 = Player(1);
+   p1.setMovement(UP,DOWN,NOKEY,NOKEY);
+   p1.setLocation(1, 1);
+   gobject p2 = Player(1);
+   p2.setMovement('w','s',NOKEY,NOKEY);
+   p2.setLocation(1, 9);
+   gobject p3 = Player(1);
+   p3.setMovement('t','g',NOKEY,NOKEY);
+   p3.setLocation(9, 1);
+   gobject p4 = Player(1);
+   p4.setMovement('i','k',NOKEY,NOKEY);
+  p4.setLocation(9, 9);
+  gobject ball = Ball(3);
+  ball.setLocation(5, 5);
+  when (ball in Player){
+      ball.direction *= -1;
+  }
+  when (ball in rightBorder){
+     team1Score++;
+     ball.setLocation(5, 5);
+  }
+  when (ball in leftBorder){
+     team2Score++;
+     ball.setLocation(5,5);
+  }
+  when (ball in upBorder or ball in downBorder){
+     ball.direction *= -1;
+  }
+
+
+  if(team1Score == 10){
+    load(winScene,"team 1"); // esta Escena imprimiría en pantalla “Team 1 wins”
+  }
+  elif(team2Score == 10)
+  {
+    load(winScene,"team 2"); // esta Escena imprimiría en pantalla “Team 2 wins”
+  }
+
+  
+
+}
+
+// Creamos a los 4 jugadores:
+gobject Player(int speed) {
+   block hitbox[3][1]; // 3 posiciones de ancho, 1 posición de altura
+   this.speed = speed;
+   return this;
+}
+
+// p2,p3,p4 serian iguales pero modificando las teclas de movimiento
+
+gobject Ball(int speed) {
+   block hitbox[1][1]; // 1 posición de ancho, 1 posición de altura
+   this.speed = speed;
+   movement = both; // el usuario podría definir solo movimiento horizontal/vertical
+   return this;
+}
+// Creamos escena (en este caso única y suponiendo que es 10x10 en tamaño)
+// UP,DOWN y NOKEY serían macros proporcionadas por el lenguaje
+
