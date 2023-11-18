@@ -135,7 +135,7 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 
 {digit}+									{ return IntegerPatternAction(yytext, yyleng); }
 
-{whitespace}+								{ IgnoredPatternAction(yytext, yyleng); }
+
 
 "#DEFINE"                                      { return ConstPatternAction(); }
 "onClick"                                   { return OnclickPatternAction(); }
@@ -167,7 +167,7 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 
 
 {letter}{var}*									{ return VarnamePatternAction(yytext, yyleng); }
-
+{whitespace}+								{ IgnoredPatternAction(yytext, yyleng); }
 .											{ return UnknownPatternAction(yytext, yyleng); }
 
  /* {letter}+                                   { return LetterPatternAction(yytext, yyleng); } */
