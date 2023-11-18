@@ -157,7 +157,7 @@ token NotEqualPatternAction()
 	return NOT_EQUAL;
 }
 
-token NegationPatternAction(const char *lexeme, const int length)
+token NegationPatternAction()
 {
 	LogDebug("[Flex] NegationPatternAction: '!'.");
 	yylval.token = NEGATION;

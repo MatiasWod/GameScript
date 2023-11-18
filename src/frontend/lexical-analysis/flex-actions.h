@@ -108,6 +108,8 @@ token StringTextPatternAction(const char * lexeme, const int length);
 token ArrayPatternAction(const char * lexeme, const int length);
 token CharTextPatternAction(const char * lexeme, const int length);
 
+
+token NegationPatternAction();
 token NokeyPatternAction();
 token UpBorderPatternAction();
 token DownBorderPatternAction();

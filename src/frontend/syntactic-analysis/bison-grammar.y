@@ -151,7 +151,7 @@
 %type <token> if_options
 %type <token> varsingleaction
 %type <token> for_options
-
+%type <token> negation
 
 // Reglas de asociatividad y precedencia (de menor a mayor).
 %left  INCREMENT DECREMENT
@@ -209,7 +209,6 @@ parameters: %empty 													{ $$ = 0 /* EmptyParametersGrammarAction() */ ; 
 
 body: %empty														{ $$ = 0 /* EmptyBodyGrammarAction() */ ; } 
 	| conditionals body													{ $$ = 0 /* ConditionalsBodyGrammarAction($1, $2) */ ; }
-	| VARNAME function_assignment SEMICOLON body									{ $$ = 0 /* BodyGrammarAction($1, $2, $3) */ ; }
 	| THIS array assignment returnValue SEMICOLON	body																{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
 	| THIS array assignment functionvalue SEMICOLON body								{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
 	| functionvalue SEMICOLON body											{ $$ = 0 /* BodyGrammarAction($1, $2) */ ; }
@@ -245,9 +244,6 @@ array: %empty 														{ $$ = 0 /* EmptyArrayGrammarAction() */ ; }
 	;
 
 returnValue: constant													{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| VARNAME															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| INTEGER															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| QUOTE STRING_TEXT	QUOTE													{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
 	| THIS                                                              { $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
 	| CHAR_TEXT														 { $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
 	| gconstant															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
@@ -266,14 +262,15 @@ value: type 														{ $$ = 0 /* TypeValueGrammarAction($1);  */ ; }
 functionvalue: VARNAME OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS	{ $$ = 0 /* FunctionValueGrammarAction($1, $3) */ ; }
 	;
 
-// var word OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE
-// CONST value
-conditionals:  WHEN OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE		{ $$ = 0 /* WhenBodyGrammarAction($3, $5) */ ; }
-	| WHEN OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE ELSE OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* WhenElseBodyGrammarAction($3, $5, $9) */ ; }
-	| IF OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	if_options	{ $$ = 0 /* IfBodyGrammarAction($3, $5) */ ; }
-	| FOR OPEN_PARENTHESIS INT VARNAME EQUAL INTEGER SEMICOLON boolean SEMICOLON for_options CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* ForBodyGrammarAction($3, $5, $7, $9, $11, $14) */ ; }
-	| WHILE OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE			{ $$ = 0 /* WhileBodyGrammarAction($3, $5) */ ; }
+conditionals:  WHEN OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE		{ $$ = 0 /* WhenBodyGrammarAction($3, $5) */ ; }
+	| WHEN OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE ELSE OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* WhenElseBodyGrammarAction($3, $5, $9) */ ; }
+	| IF OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	if_options	{ $$ = 0 /* IfBodyGrammarAction($3, $5) */ ; }
+	| FOR OPEN_PARENTHESIS INT VARNAME EQUAL INTEGER SEMICOLON negation boolean SEMICOLON for_options CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* ForBodyGrammarAction($3, $5, $7, $9, $11, $14) */ ; }
+	| WHILE OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE			{ $$ = 0 /* WhileBodyGrammarAction($3, $5) */ ; }
 	;
+
+negation: %empty													{ $$ = 0 /* EmptyForOptionsGrammarAction() */ ; }
+	| NEGATION														{ $$ = 0 /* EmptyForOptionsGrammarAction() */ ; }
 
 for_options: %empty													{ $$ = 0 /* EmptyForOptionsGrammarAction() */ ; }
 	| VARNAME INCREMENT														{ $$ = 0 /* ForOptionsGrammarAction($1) */ ; }
@@ -289,14 +286,6 @@ if_options: %empty													{ $$ = 0 /* EmptyIfOptionsGrammarAction() */ ; }
 	| ELIF OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE if_options { $$ = 0 /* ElifBodyGrammarAction($3, $5, $7) */ ; }
 	| ELSE OPEN_BRACE body CLOSE_BRACE										{ $$ = 0 /* ElseBodyGrammarAction($3) */ ; }
 	;
-
-//	(1 < 2) integer[left] MINOR integer[right]
-//	| (1 > 2) integer[left] MAJOR integer[right]
-//	| (1 <= 2) integer[left] MINOR_EQUAL integer[right]
-//	| (1 >= 2) integer[left] MAJOR_EQUAL integer[right]	
-//	| (1 == 2) integer[left] EQUAL integer[right]
-//	| (1 != 2) integer[left] NOT_EQUAL integer[right]
-//	| (true) boolean
 
 boolean: mathexp[left] LESS_THAN mathexp[right]						{ $$ = 0 ; /* MinorBooleanGrammarAction($left, $right); */ }
 	| mathexp[left] GREATER_THAN mathexp[right]							{ $$ = 0 ; /* MajorBooleanGrammarAction($left, $right); */ }

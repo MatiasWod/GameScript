@@ -101,7 +101,7 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 
 
 
-"!"{var}                                    { return NegationPatternAction(yytext,yyleng); }
+"!"                                   { return NegationPatternAction(); }
 "NOT"                                       { return NotPatternAction();}
 "not"                                       { return NotPatternAction();}
 "AND"                                       { return AndPatternAction();}        
