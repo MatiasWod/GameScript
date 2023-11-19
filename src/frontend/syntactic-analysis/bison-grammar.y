@@ -4,6 +4,8 @@
 
 %}
 
+
+
 // Tipos de dato utilizados en las variables semánticas ($$, $1, $2, etc.).
 %union {
 	// No-terminales (backend).
@@ -16,25 +18,33 @@
 	*/
 
 	// No-terminales (frontend).
-	int program;
-	int expression;
-	int factor;
-	int constant;
-	int conditionals;
-	int condition;
-	int boolean;
-	int function;
-	int type;
-	int parameters_def;
-	int parameters;
-	int body;
-	int value;
-	int functionvalue;
-	int mathexp;
-	char * string;
-	char character;
-	int constante;
-
+	Program program;
+	MainScene mainscene;
+	Expression expression;
+	Factor factor;
+	Constant constant;
+	Conditionals conditionals;
+	Boolean boolean;
+	Function function;
+	Type type;
+	Parameters_def parameters_def;
+	Parameters parameters;
+	Body body;
+	Value value;
+	Functionvalue functionvalue;
+	Mathexp mathexp;
+	String string;
+	Character character;
+	Constante constante;
+	Array array;
+	Assignment assignment;
+	ReturnValue returnvalue;
+	VarSingleAction varsingleaction;
+	Negation negation;
+	GConstant gconstant;
+	FunctionAssignment function_assignment;
+	IfOptions if_options;
+	ForOptions for_options;
 	// Terminales.
 	token token;
 	int integer;
@@ -141,17 +151,17 @@
 %type <value> value
 %type <functionvalue> functionvalue
 %type <mathexp> mathexp
-%type <token> array
-%type <token> returnValue
-%type <token> main_scene
+%type <array> array
+%type <returnvalue> returnValue
+%type <mainscene> main_scene
 %type <token> parameters
-%type <token> function_assignment
-%type <token> gconstant
-%type <token> assignment
-%type <token> if_options
-%type <token> varsingleaction
-%type <token> for_options
-%type <token> negation
+%type <function_assignment> function_assignment
+%type <gconstant> gconstant
+%type <assignment> assignment
+%type <if_options> if_options
+%type <varsingleaction> varsingleaction
+%type <for_options> for_options
+%type <negation> negation
 
 // Reglas de asociatividad y precedencia (de menor a mayor).
 %left  INCREMENT DECREMENT
