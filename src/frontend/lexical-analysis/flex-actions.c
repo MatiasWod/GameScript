@@ -1,5 +1,6 @@
 #include "../../backend/support/logger.h"
 #include "flex-actions.h"
+#include "../../backend/semantic-analysis/symbol-table.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -461,6 +462,7 @@ token DotPatternAction()
 token OpenBracePatternAction()
 {
 	LogDebug("[Flex] OpenBracePatternAction: '{'.");
+	StepIntoScope();
 	yylval.token = OPEN_BRACE;
 	return OPEN_BRACE;
 }
@@ -468,6 +470,7 @@ token OpenBracePatternAction()
 token CloseBracePatternAction()
 {
 	LogDebug("[Flex] CloseBracePatternAction: '}'.");
+	LeaveScope();
 	yylval.token = CLOSE_BRACE;
 	return CLOSE_BRACE;
 }
