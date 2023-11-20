@@ -39,17 +39,22 @@ typedef enum {
 // El tipo de los tokens emitidos por Flex.
 typedef int token;
 
+#define MAX_ERROR_LENGTH 255
+
+typedef struct ErrorListNode * ErrorList;
+
 // Estado global de toda la aplicación.
 typedef struct {
 
 	// Indica si la compilación tuvo problemas hasta el momento.
 	boolean succeed;
-
+	ErrorList errors;
+	ErrorList last_error;
+	unsigned int error_count;
 	// Indica el resultado de la compilación (para la calculadora).
-	int result;
-
+	boolean game_generation;
 	// El nodo raíz del AST (se usará cuando se implemente el backend).
-	Program * program;
+	Program program;
 
 	// Agregar lo que sea necesario para el compilador.
 	// Agregar una pila para manipular scopes.

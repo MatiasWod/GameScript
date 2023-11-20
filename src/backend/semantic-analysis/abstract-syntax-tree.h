@@ -74,6 +74,7 @@ struct BodyNode
 {
 	BodyType bType;
 	char * var;
+	char * str;
 	Body body;
 	Conditionals conditionals;
 	Array array;
@@ -109,9 +110,12 @@ typedef enum {
 struct ConditionalsNode
 {
 	ConditionalsType conditionalsType;
-	Body body;
+	Body firstBody;
+	Body secondBody;
 	Negation negation;
 	Boolean boolean;
+	char * varName;
+	int rightValue;
 	ForOptions foroptions;
 	IfOptions ifoptions;
 };
@@ -127,6 +131,7 @@ struct ArrayNode
 {
 	ArrayType aType;
 	char * var;
+	int value;
 	Array array;
 };
 
@@ -148,7 +153,7 @@ typedef enum
 {
 	RT_CONSTANT,
 	RT_THIS,
-	RT_CHART_TEXT,
+	RT_CHAR_TEXT,
 	RT_GCONSTANT,
 	RT_THIS_VAR_ARRAY,
 	RT_THIS_FUNC,
@@ -228,8 +233,8 @@ typedef enum{
 struct ConstantNode
 {
     ConstantType cType;
-	Value value;
-    chhar * var;
+	int value;
+    char * var;
     char * str;
 };
 
@@ -358,6 +363,7 @@ struct IfOptionsNode{
 	Body body;
 	Boolean boolean;
 	IfOptions ifOptions;
+	IfOptionsType ifOptionsType;
 };
 
 typedef enum {
@@ -375,6 +381,7 @@ struct ForOptionsNode {
 	ForOptionsType forOptionsType;
 	Mathexp mathexp;
 	char * var;
+	int value;
 };
 
 typedef enum
