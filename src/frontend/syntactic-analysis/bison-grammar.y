@@ -183,135 +183,135 @@
 program: main_scene													{ $$ = ProgramGrammarAction($1) ; }
 	;
 
-main_scene: SCENE MAIN_SCENE OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE expression	{ $$ = 0 /* MainSceneGrammarAction($1, $4, $7) */ ; }
+main_scene: SCENE MAIN_SCENE OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE expression	{ $$ = MainSceneGrammarAction($6, $8) ; }
 	;
-expression: %empty 												{ $$ = 0 /* EmptyExpressionGrammarAction() */ ; }
-	| function expression 						{ $$ = 0 /* FunctionExpressionGrammarAction($1); */ ; }
-	| constante expression											{ $$ = 0 /* ConstExpressionGrammarAction($1, $2); */ ; }
-	;
-
-function: type VARNAME OPEN_PARENTHESIS parameters_def CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* FunctionGrammarAction($1, $2, $4, $7) */ ; }
-	;
-constante: CONST value 												{ $$ = 0 /* ConstantGrammarAction($1, $2); */ ; }
+expression: %empty 												{ $$ = ExpressionEmptyGrammarAction()  ; }
+	| function expression 						{ $$ = ExpressionFunctionGrammarAction($1,$2) ; }
+	| constante expression											{ $$ = ExpressionConstGrammarAction($1, $2);}
 	;
 
-type: INT															{ $$ = 0 /* IntTypeGrammarAction(); */ ; }
-	| TEXT															{ $$ = 0 /* TextTypeGrammarAction(); */ ; }
-	| BOOL															{ $$ = 0 /*  BoolTypeGrammarAction(); */ ;}
-	| CHAR															{ $$ = 0 /* CharTypeGrammarAction() */ ; }
-	| RGB															{ $$ = 0 /* RGBTypeGrammarAction() */ ; }
-	| BLOCK															{ $$ = 0 /*  BlockTypeGrammarAction() */ ; }
-	| GOBJECT														{ $$ = 0 /* GObjectGrammarAction() */ ; }
-	| SCENE															{ $$ = 0 /* SceneGrammarAction() */ ; }
-	| BUTTON														{ $$ = 0 /* ButtonGrammarAction() */ ; }
-	| STRING 														{ $$ = 0 /* StringGrammarAction() */ ; }
+function: type VARNAME OPEN_PARENTHESIS parameters_def CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = 0  FunctionGrammarAction($1, $2, $4, $7)  ; }
+	;
+constante: CONST value 												{ $$ = ConstanteGrammarAction($2); }
 	;
 
-parameters_def: %empty													{ $$ = 0 /* EmptyParametersGrammarAction() */ ; }
-	| type VARNAME														{ $$ = 0 /* ParametersGrammarAction($1, $2) */ ; }
-	| type VARNAME COMMA parameters_def									{ $$ = 0 /* ParametersGrammarAction($1, $2, $4) */ ; }
+type: INT															{ $$ = 0  IntTypeGrammarAction() ;}
+	| TEXT															{ $$ = 0  TextTypeGrammarAction();   }
+	| BOOL															{ $$ = 0   BoolTypeGrammarAction();  }
+	| CHAR															{ $$ = 0  CharTypeGrammarAction()  ; }
+	| RGB															{ $$ = 0  RGBTypeGrammarAction()  ; }
+	| BLOCK															{ $$ = 0   BlockTypeGrammarAction()  ; }
+	| GOBJECT														{ $$ = 0  GObjectGrammarAction()  ; }
+	| SCENE															{ $$ = 0  SceneGrammarAction()  ; }
+	| BUTTON														{ $$ = 0  ButtonGrammarAction()  ; }
+	| STRING 														{ $$ = 0  StringGrammarAction()  ; }
 	;
 
-parameters: %empty 													{ $$ = 0 /* EmptyParametersGrammarAction() */ ; }
-	| returnValue														{ $$ = 0 /* ParametersGrammarAction($1) */ ; }
-	| returnValue COMMA parameters										{ $$ = 0 /* ParametersGrammarAction($1, $3) */ ; }
+parameters_def: %empty													{ $$ = EmptyParametersGrammarAction(); }
+	| type VARNAME														{ $$ = ParametersGrammarAction($1, $2); }
+	| type VARNAME COMMA parameters_def									{ $$ = ParametersCommaGrammarAction($1, $2, $4); }
 	;
 
-body: %empty														{ $$ = 0 /* EmptyBodyGrammarAction() */ ; } 
-	| conditionals body													{ $$ = 0 /* ConditionalsBodyGrammarAction($1, $2) */ ; }
-	| THIS array assignment returnValue SEMICOLON	body																{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
-	| THIS array assignment functionvalue SEMICOLON body								{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
-	| functionvalue SEMICOLON body											{ $$ = 0 /* BodyGrammarAction($1, $2) */ ; }
-	| THIS array functionvalue SEMICOLON body 									{ $$ = 0 /* ThisBodyGrammarAction($3) */ ; }
-	| type VARNAME array assignment constant SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }	
-	| type VARNAME array SEMICOLON body										{ $$ = 0 /* BodyGrammarAction($1, $2, $4); */ ; }
-	| type VARNAME array assignment STRING_TEXT SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
-	| VARNAME array assignment constant SEMICOLON body								{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
-	| VARNAME array assignment functionvalue SEMICOLON body								{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
-	| type VARNAME array assignment functionvalue SEMICOLON body							{ $$ = 0 /* BodyGrammarAction($1, $2, $4, $6); */ ; }
-	| VARNAME array varsingleaction SEMICOLON body										{ $$ = 0 /* BodyGrammarAction($1, $2, $3, $4); */ ; } 
-	| RETURN returnValue SEMICOLON											{ $$ = 0 /* BodyGrammarAction($1, $2, $4); */ ; }
-	| ONCLICK OPEN_PARENTHESIS functionvalue CLOSE_PARENTHESIS SEMICOLON body 						{ $$ = 0 /* BodyGrammarAction($1, $3, $5); */ ; } 
+parameters: %empty 													{ $$ = EmptyParametersGrammarAction(); }
+	| returnValue														{ $$ = ParametersGrammarAction($1); }
+	| returnValue COMMA parameters										{ $$ = ParametersCommaGrammarAction($1, $3); }
 	;
 
-varsingleaction: INCREMENT														{ $$ = 0 /* VarSingleActionGrammarAction($1); */ ; }
-	| DECREMENT														{ $$ = 0 /* VarSingleActionGrammarAction($1); */ ; }
+body: %empty														{ $$ = BodyEmptyGrammarAction() ; } 
+	| conditionals body													{ $$ = BodyConditionalsGrammarAction($1, $2) ; }
+	| THIS array assignment returnValue SEMICOLON	body      { $$ = BodyThisAssignRetGrammarAction($2,$3,$4,$6) ; }
+	| THIS array assignment functionvalue SEMICOLON body								{ $$ = BodyThisAssignFuncGrammarAction($2,$3,$4,$6); }
+	| functionvalue SEMICOLON body											{ $$ = BodyFuncGrammarAction($1, $3)  ; }
+	| THIS array functionvalue SEMICOLON body 									{ $$ =  BodyThisArrayFuncGrammarAction($2,$3,$5)  ; }
+	| type VARNAME array assignment constant SEMICOLON body							{ $$ = BodyTypeAssignConstGrammarAction($1, $2,$3, $4, $5, $7);  }	
+	| type VARNAME array SEMICOLON body										{ $$ = BodyTypeArrayGrammarAction($1, $2, $3,$5) ; }
+	| type VARNAME array assignment STRING_TEXT SEMICOLON body							{ $$ = BodyTypeArrayAssignStringGrammarAction($1, $2,$3, $4, $5,$7); }
+	| VARNAME array assignment constant SEMICOLON body								{ $$  BodyVarArrayAssignConstGrammarAction($1, $2,$3, $4, $6) ; }
+	| VARNAME array assignment functionvalue SEMICOLON body								{ $$ = BodyVarArrayAssignFuncGrammarAction($1, $2, $3, $4, $6) ; }
+	| type VARNAME array assignment functionvalue SEMICOLON body     { $$ = BodyTypeVarArrayAssignFuncGrammarAction($1, $2, $4, $5,$7) ; }
+	| VARNAME array varsingleaction SEMICOLON body										{ $$ = BodyVarArraySingleGrammarAction($1, $2, $3, $5) ; } 
+	| RETURN returnValue SEMICOLON											{ $$ = BodyRetGrammarAction($2); }
+	| ONCLICK OPEN_PARENTHESIS functionvalue CLOSE_PARENTHESIS SEMICOLON body 						{ $$ = BodyOnClickGrammarAction($3, $6); } 
 	;
 
-assignment: EQUAL 												{ $$ = 0 /* AssignmentGrammarAction($1, $2) */ ; }
-	| PLUS_EQUAL 														{ $$ = 0 /* AssignmentGrammarAction($1, $2) */ ; }
-	| MINUS_EQUAL 														{ $$ = 0 /* AssignmentGrammarAction($1, $2) */ ; }
-	| SLASH_EQUAL 														{ $$ = 0 /* AssignmentGrammarAction($1, $2) */ ; }
-	| MUL_EQUAL 														{ $$ = 0 /* AssignmentGrammarAction($1, $2) */ ; }
-	;
-function_assignment: OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS { $$ = 0 /* FunctionAssignmentGrammarAction($1, $3, $6) */ ; }
+varsingleaction: INCREMENT														{ $$ = 0  IncrementVarSingleActionGrammarAction();  ; }
+	| DECREMENT														{ $$ = 0  DecrementVarSingleActionGrammarAction();  ; }
 	;
 
-array: %empty 														{ $$ = 0 /* EmptyArrayGrammarAction() */ ; }
-	| OPEN_BRACKET VARNAME CLOSE_BRACKET array										{ $$ = 0 /* ArrayGrammarAction($2) */ ; }
-	| OPEN_BRACKET INTEGER CLOSE_BRACKET array								{ $$ = 0 /* ArrayGrammarAction($2) */ ; }
-	| OPEN_BRACKET CLOSE_BRACKET array										{ $$ = 0 /* ArrayGrammarAction() */ ; }
+assignment: EQUAL 												{ $$ = 0  EqualAssignmentGrammarAction()  ; }
+	| PLUS_EQUAL 														{ $$ = 0  PlusEqualAssignmentGrammarAction()  ; }
+	| MINUS_EQUAL 														{ $$ = 0  MinusEqualAssignmentGrammarAction()  ; }
+	| SLASH_EQUAL 														{ $$ = 0  SlashEqualAssignmentGrammarAction()  ; }
+	| MUL_EQUAL 														{ $$ = 0  MulEqualAssignmentGrammarAction()  ; }
+	;
+function_assignment: OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS { $$ = 0  FunctionAssignmentGrammarAction($2)  ; }
 	;
 
-returnValue: constant													{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| THIS                                                              { $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| CHAR_TEXT														 { $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| gconstant															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| THIS VARNAME array													{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| THIS functionvalue											{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| constant SUB constant 															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| constant ADD constant 															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| constant MUL constant 															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
-	| constant DIV constant 															{ $$ = 0 /* ReturnValueGrammarAction($1); */ ; }
+array: %empty 														{ $$ = 0  EmptyArrayGrammarAction()  ; }
+	| OPEN_BRACKET VARNAME CLOSE_BRACKET array										{ $$ = 0  VarnameArrayGrammarAction($2,$4)  ; }
+	| OPEN_BRACKET INTEGER CLOSE_BRACKET array								{ $$ = 0  IntegerArrayGrammarAction($2,$4)  ; }
+	| OPEN_BRACKET CLOSE_BRACKET array										{ $$ = 0  ArrayArrayGrammarAction($3)  ; }
 	;
 
-value: type 														{ $$ = 0 /* TypeValueGrammarAction($1);  */ ; }
-	| functionvalue   												{ $$ = 0 /* FunctionValueGrammarAction($1); */ ; }
+returnValue: constant													{ $$ = ReturnValueGrammarAction($1); }
+	| THIS                                                              { $$ =ReturnValueThisGrammarAction(); }
+	| CHAR_TEXT														 { $$ = ReturnValueCharTextGrammarAction(); }
+	| gconstant															{ $$ =  ReturnValueGconstantGrammarAction($1); }
+	| THIS VARNAME array													{ $$ = ReturnValueVarnameArrayGrammarAction($2,$3); }
+	| THIS functionvalue											{ $$ = ReturnValueThisFunctionvalueGrammarAction($1);}
+	| constant SUB constant 															{ $$ = ReturnValueConstantSubGrammarAction($1,$2); }
+	| constant ADD constant 															{ $$ = ReturnValueConstantAddGrammarAction($1,$2); }
+	| constant MUL constant 															{ $$ = ReturnValueConstantMulGrammarAction($1,$2); }
+	| constant DIV constant 															{ $$ = ReturnValueConstantDivGrammarAction($1,$2); }
+	;
+
+value: type 														{ $$ = 0  TypeValueGrammarAction($1);   ; }
+	| functionvalue   												{ $$ = 0  FunctionValueValueGrammarAction($1);  ; }
 ;
 
-functionvalue: VARNAME OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS	{ $$ = 0 /* FunctionValueGrammarAction($1, $3) */ ; }
+functionvalue: VARNAME OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS	{ $$ = FunctionValueGrammarAction($1, $3); }
 	;
 
-conditionals:  WHEN OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE		{ $$ = 0 /* WhenBodyGrammarAction($3, $5) */ ; }
-	| WHEN OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE ELSE OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* WhenElseBodyGrammarAction($3, $5, $9) */ ; }
-	| IF OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	if_options	{ $$ = 0 /* IfBodyGrammarAction($3, $5) */ ; }
-	| FOR OPEN_PARENTHESIS INT VARNAME EQUAL INTEGER SEMICOLON negation boolean SEMICOLON for_options CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = 0 /* ForBodyGrammarAction($3, $5, $7, $9, $11, $14) */ ; }
-	| WHILE OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE			{ $$ = 0 /* WhileBodyGrammarAction($3, $5) */ ; }
+conditionals:  WHEN OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE		{ $$ = 0  WhenBodyGrammarAction($3, $4, $7)  ; }
+	| WHEN OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE ELSE OPEN_BRACE body CLOSE_BRACE	{ $$ = 0  WhenElseBodyGrammarAction($3, $4, $7, $11)  ; }
+	| IF OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	if_options	{ $$ = 0  IfBodyGrammarAction($3, $4, $7, $9)  ; }
+	| FOR OPEN_PARENTHESIS INT VARNAME EQUAL INTEGER SEMICOLON negation boolean SEMICOLON for_options CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = 0  ForBodyGrammarAction($4, $6, $8, $9, $11, $14)  ; }
+	| WHILE OPEN_PARENTHESIS negation boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE			{ $$ = 0  WhileBodyGrammarAction($3, $4, $7)  ; }
 	;
 
-negation: %empty													{ $$ = 0 /* EmptyForOptionsGrammarAction() */ ; }
-	| NEGATION														{ $$ = 0 /* EmptyForOptionsGrammarAction() */ ; }
+negation: %empty													{ $$ = EmptyNegationGrammarAction(); }
+	| NEGATION														{ $$ = NegationGrammarAction(); }
 
-for_options: %empty													{ $$ = 0 /* EmptyForOptionsGrammarAction() */ ; }
-	| VARNAME INCREMENT														{ $$ = 0 /* ForOptionsGrammarAction($1) */ ; }
-	| VARNAME DECREMENT														{ $$ = 0 /* ForOptionsGrammarAction($1) */ ; }
-	| VARNAME PLUS_EQUAL INTEGER													{ $$ = 0 /* ForOptionsGrammarAction($1, $3) */ ; }
-	| VARNAME MINUS_EQUAL INTEGER													{ $$ = 0 /* ForOptionsGrammarAction($1, $3) */ ; }
-	| VARNAME SLASH_EQUAL INTEGER													{ $$ = 0 /* ForOptionsGrammarAction($1, $3) */ ; }
-	| VARNAME MUL_EQUAL INTEGER													{ $$ = 0 /* ForOptionsGrammarAction($1, $3) */ ; }
-	| VARNAME EQUAL mathexp														{ $$ = 0 /* ForOptionsGrammarAction($1, $3) */ ; }
+for_options: %empty													{ $$ = EmptyForOptionsGrammarAction(); }
+	| VARNAME INCREMENT														{ $$ = IncForOptionsGrammarAction($1); }
+	| VARNAME DECREMENT														{ $$ = DecForOptionsGrammarAction($1); }
+	| VARNAME PLUS_EQUAL INTEGER													{ $$ = PlusEqualForOptionsGrammarAction($1, $3); }
+	| VARNAME MINUS_EQUAL INTEGER													{ $$ = MinusEqualForOptionsGrammarAction($1, $3); }
+	| VARNAME SLASH_EQUAL INTEGER													{ $$ = SlashEqualForOptionsGrammarAction($1, $3); }
+	| VARNAME MUL_EQUAL INTEGER													{ $$ = MulEqualForOptionsGrammarAction($1, $3); }
+	| VARNAME EQUAL mathexp														{ $$ = EqualForOptionsGrammarAction($1, $3); }
 	;
 
-if_options: %empty													{ $$ = 0 /* EmptyIfOptionsGrammarAction() */ ; }
-	| ELIF OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE if_options { $$ = 0 /* ElifBodyGrammarAction($3, $5, $7) */ ; }
-	| ELSE OPEN_BRACE body CLOSE_BRACE										{ $$ = 0 /* ElseBodyGrammarAction($3) */ ; }
+if_options: %empty													{ $$ = EmptyIfOptionsGrammarAction(); }
+	| ELIF OPEN_PARENTHESIS boolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE if_options { $$ = ElifBodyGrammarAction($3, $6, $8); }
+	| ELSE OPEN_BRACE body CLOSE_BRACE										{ $$ = ElseBodyGrammarAction($3); }
 	;
 
-boolean: mathexp[left] LESS_THAN mathexp[right]						{ $$ = 0 ; /* MinorBooleanGrammarAction($left, $right); */ }
-	| mathexp[left] GREATER_THAN mathexp[right]							{ $$ = 0 ; /* MajorBooleanGrammarAction($left, $right); */ }
-	| mathexp[left] LESS_THAN_OR_EQUAL mathexp[right]						{ $$ = 0; /*  MinorEqualBooleanGrammarAction($left, $right); */ }
-	| mathexp[left] GREATER_THAN_OR_EQUAL mathexp[right]						{ $$ = 0; /* MajorEqualBooleanGrammarAction($left, $right); */ }
+boolean: mathexp[left] LESS_THAN mathexp[right]						{ $$ = MinorBooleanGrammarAction($left, $right); }
+	| mathexp[left] GREATER_THAN mathexp[right]							{ $$ = MajorBooleanGrammarAction($left, $right); }
+	| mathexp[left] LESS_THAN_OR_EQUAL mathexp[right]						{ $$ = MinorEqualBooleanGrammarAction($left, $right); }
+	| mathexp[left] GREATER_THAN_OR_EQUAL mathexp[right]						{ $$ = MajorEqualBooleanGrammarAction($left, $right); }
 	| mathexp[left] EQUAL_EQUAL mathexp[right]							{ $$ =  EqualBooleanGrammarAction($left, $right);  }
-	| mathexp[left] NOT_EQUAL mathexp[right]						{ $$ = 0; /* NotEqualBooleanGrammarAction($left, $right); */ }
-	| boolean OR boolean												{ $$ = 0; /* OrBooleanGrammarAction($1, $3); */ }
-	| boolean AND boolean												{ $$ = 0; /* OrBooleanGrammarAction($1, $3); */ }
-	| VARNAME IN VARNAME													{ $$ = 0; /* InBooleanGrammarAction($3); */ }
-	| VARNAME IN gconstant 												{ $$ = 0; /* InBooleanGrammarAction($3); */ }
-	| VARNAME                   				   { $$ = 0; /* VarnameBooleanGrammarAction($1); */ }
-	| VARNAME function_assignment 				   { $$ = 0; /* VarnameBooleanGrammarAction($1); */ }
-	| VARNAME HITS VARNAME													{ $$ = 0; /* InBooleanGrammarAction($3); */ }
-	| VARNAME HITS gconstant 												{ $$ = 0; /* InBooleanGrammarAction($3); */ }
-	| conditionals													{ $$ = 0; /* ConditionalsBooleanGrammarAction($1); */ }
+	| mathexp[left] NOT_EQUAL mathexp[right]						{ $$ = NotEqualBooleanGrammarAction($left, $right); }
+	| boolean OR boolean												{ $$ = OrBooleanGrammarAction($1, $3); }
+	| boolean AND boolean												{ $$ =  OrBooleanGrammarAction($1, $3);  }
+	| VARNAME IN VARNAME													{ $$ = InBooleanGrammarAction($3);  }
+	| VARNAME IN gconstant 												{ $$ = InBooleanGrammarAction($3);  }
+	| VARNAME                   				   { $$ = VarnameBooleanGrammarAction($1); }
+	| VARNAME function_assignment 				   { $$ =  VarnameBooleanGrammarAction($1);  }
+	| VARNAME HITS VARNAME													{ $$ = InBooleanGrammarAction($3); }
+	| VARNAME HITS gconstant 												{ $$ =  InBooleanGrammarAction($3); }
+	| conditionals													{ $$ = ConditionalsBooleanGrammarAction($1); }
 	;
 
 
@@ -327,22 +327,22 @@ factor: OPEN_PARENTHESIS mathexp CLOSE_PARENTHESIS				{ $$ = ExpressionFactorGra
 	;
 
 constant: INTEGER													{ $$ = IntegerConstantGrammarAction($1); }
-	| VARNAME														{ $$ = 0 /* VarnameConstantGrammarAction($1); */ ; }
-	| SUB INTEGER 													{ $$ = 0 /* SubstractIntegerConstantGrammarAction($1, $2); */ ; }
-	| INTEGER PX 													{ $$ = 0 /* IntegerPxConstantGrammarAction($1, $2); */ ; }
-	| QUOTE STRING_TEXT QUOTE 										{ $$ = 0 /* StringConstantGrammarAction($2); */ ; }
+	| VARNAME														{ $$ = ConstantVarnameGrammarAction($1); }
+	| SUB INTEGER 													{ $$ = ConstantSubstractIntegerGrammarAction($1, $2); }
+	| INTEGER PX 													{ $$ = IntegerPxConstantGrammarAction($1, $2); }
+	| QUOTE STRING_TEXT QUOTE 										{ $$ = StringConstantGrammarAction($2); }
 	;
 
-gconstant: UP_BORDER 												{ $$ = 0 /* UpBorderConstantGrammarAction(); */ ; }
-	| DOWN_BORDER													{ $$ = 0 /* DownBorderConstantGrammarAction(); */ ; }
-	| LEFT_BORDER													{ $$ = 0 /* LeftBorderConstantGrammarAction(); */ ; }
-	| RIGHT_BORDER													{ $$ = 0 /* RightBorderConstantGrammarAction(); */ ; }
-	| UP															{ $$ = 0 /* UpConstantGrammarAction(); */ ; }
-	| DOWN															{ $$ = 0 /* DownConstantGrammarAction(); */ ; }
-	| LEFT															{ $$ = 0 /* LeftConstantGrammarAction(); */ ; }
-	| RIGHT															{ $$ = 0 /* RightConstantGrammarAction(); */ ; }
-	| SPACE															{ $$ = 0 /* SpaceConstantGrammarAction(); */ ; }
-	| ENTER															{ $$ = 0 /* EnterConstantGrammarAction(); */ ; }
-	| NOKEY															{ $$ = 0 /* NokeyConstantGrammarAction(); */ ; }
+gconstant: UP_BORDER 												{ $$ = UpBorderConstantGrammarAction(); }
+	| DOWN_BORDER													{ $$ = DownBorderConstantGrammarAction(); }
+	| LEFT_BORDER													{ $$ = LeftBorderConstantGrammarAction(); }
+	| RIGHT_BORDER													{ $$ = RightBorderConstantGrammarAction(); }
+	| UP															{ $$ = UpConstantGrammarAction(); }
+	| DOWN															{ $$ = DownConstantGrammarAction();  }
+	| LEFT															{ $$ = LeftConstantGrammarAction();  }
+	| RIGHT															{ $$ = RightConstantGrammarAction(); }
+	| SPACE															{ $$ = SpaceConstantGrammarAction(); }
+	| ENTER															{ $$ = EnterConstantGrammarAction(); }
+	| NOKEY															{ $$ = NokeyConstantGrammarAction(); }
 	;
 %%

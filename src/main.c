@@ -7,12 +7,36 @@
 // Estado de la aplicación.
 CompilerState state;
 
+//TODO MOVER DE ACA
+void FreeAll() {
+    while (allocated_memory != NULL) {
+        List to_free = allocated_memory;
+        allocated_memory = to_free->next;
+        free(to_free->ptr);
+        free(to_free);
+    }
+}
+
 // Punto de entrada principal del compilador.
 const int main(const int argumentCount, const char ** arguments) {
 	// Inicializar estado de la aplicación.
 	state.program = NULL;
+	state.errors = NULL;
+	state.last_error = NULL;
+	state.error_count = 0;
 	state.result = 0;
 	state.succeed = false;
+	state.game_generation = false;
+
+	// Checkeamos que unicamente se ponga el path del archivo a correr, sin argumentos
+
+	if (argumentCount != 1) {
+		LogError("Cantidad de argumentos invalida. Se esperaba unicamente el path del archivo a correr.");
+		return -1;
+	}
+	else {
+		state.game_generation = true;
+	}
 
 	// Mostrar parámetros recibidos por consola.
 	for (int i = 0; i < argumentCount; ++i) {
@@ -28,7 +52,7 @@ const int main(const int argumentCount, const char ** arguments) {
 			// inicial de la gramática satisfactoriamente.
 			if (state.succeed) {
 				LogInfo("La compilacion fue exitosa.");
-				Generator(state.result);
+				Generator(state.program);
 			}
 			else {
 				LogError("Se produjo un error en la aplicacion.");
@@ -37,6 +61,10 @@ const int main(const int argumentCount, const char ** arguments) {
 			break;
 		case 1:
 			LogError("Bison finalizo debido a un error de sintaxis.");
+			while (state.errors != NULL) {
+				printf("%s", state.errors->message);
+				state.errors = state.errors->next;
+			}
 			break;
 		case 2:
 			LogError("Bison finalizo abruptamente debido a que ya no hay memoria disponible.");
@@ -44,6 +72,9 @@ const int main(const int argumentCount, const char ** arguments) {
 		default:
 			LogError("Error desconocido mientras se ejecutaba el analizador Bison (codigo %d).", result);
 	}
+	FreeAll();
 	LogInfo("Fin.");
 	return result;
 }
+
+
