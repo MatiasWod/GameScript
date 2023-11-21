@@ -29,5 +29,9 @@ void InsertInSymbolTable(char * varname, VarType type);
 void DeleteFromSymbolTable(char * key);
 Symbol GetFromSymbolTable(char * key);
 boolean SymbolTableContains(char * key);
+void LeaveScope();
+void StepIntoScope();
+void tryInsertIntoSymbolTable(char *name, Type type);
+
 
 #endif

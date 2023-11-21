@@ -43,6 +43,11 @@ typedef int token;
 
 typedef struct ErrorListNode * ErrorList;
 
+struct ErrorListNode {
+	char * message;
+	ErrorList next;
+};
+
 // Estado global de toda la aplicación.
 typedef struct {
 

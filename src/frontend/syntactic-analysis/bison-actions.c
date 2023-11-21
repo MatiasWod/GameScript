@@ -1,9 +1,10 @@
-#include "../../backend/domain-specific/calculator.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "../../backend/support/logger.h"
 #include "../../backend/semantic-analysis/symbol-table.h"
 #include "bison-actions.h"
-#include <stdio.h>
-#include <string.h>
+#include "../../backend/support/shared.h"
 
 /**
  * Implementación de "bison-actions.h".
@@ -13,46 +14,7 @@
  * Esta función se ejecuta cada vez que se emite un error de sintaxis.
  */
 
-void tryInsertIntoSymbolTable(char *name, Type type){
-		if(!SymbolTableContains(name)){
-		switch (type->tType)
-		{
-		case T_INT:
-			InsertInSymbolTable(name, VARTYPE_INT);
-			break;
-		case T_TEXT:
-			InsertInSymbolTable(name, VARTYPE_TEXT);
-			break;
-		case T_BOOL:
-			InsertInSymbolTable(name, VARTYPE_BOOL);
-			break;
-		case T_CHAR:
-			InsertInSymbolTable(name, VARTYPE_CHAR);
-			break;
-		case T_RGB:
-			InsertInSymbolTable(name, VARTYPE_RGB);
-			break;
-		case T_BLOCK:
-			InsertInSymbolTable(name, VARTYPE_BLOCK);
-			break;
-		case T_GOBJECT:
-			InsertInSymbolTable(name, VARTYPE_GOBJECT);
-			break;
-		case T_SCENE:
-			InsertInSymbolTable(name, VARTYPE_SCENE);
-			break;
-		case T_BUTTON:
-			InsertInSymbolTable(name, VARTYPE_BUTTON);
-			break;
-		case T_STRING:
-			InsertInSymbolTable(name, VARTYPE_STRING);
-			break;
-		default:
-			break;
-		}
-	}
 
-}
 
  
 typedef struct Node * List;
@@ -62,9 +24,10 @@ struct Node {
     List next;
 };
 
-List allocated_memory = NULL;
+
 
 void * Malloc(size_t size) {
+	List allocated_memory = NULL;
     List new_node = malloc(sizeof(struct Node));
     void * requested_memory = malloc(size);
     new_node->ptr = requested_memory;
@@ -157,7 +120,7 @@ Expression ExpressionFunctionGrammarAction(Function function, Expression to_expr
 	return expression;
 }
 
-Constante ExpressionConstanteGrammarAction(Constante to_constante, Expression to_expression)
+Expression ExpressionConstanteGrammarAction(Constante to_constante, Expression to_expression)
 {
 	LogDebug("\tExpressionConstanteGrammarAction");
 
@@ -284,7 +247,7 @@ Type ButtonTypeGrammarAction()
 	return type;
 }
 
-Type StringTypeGrammarAction()
+Type StringGrammarAction()
 {
 	LogDebug("\tStringTypeGrammarAction");
 
@@ -294,7 +257,7 @@ Type StringTypeGrammarAction()
 	return type;
 }
 
-ParametersDef EmptyParametersGrammarAction(){
+ParametersDef EmptyParametersDefGrammarAction(){
 	LogDebug("\tEmptyParametersGrammarAction");
 
 	ParametersDef parameters_def = Malloc(sizeof(struct ParametersDefNode));
@@ -303,7 +266,7 @@ ParametersDef EmptyParametersGrammarAction(){
 	return parameters_def;
 }
 
-ParametersDef ParametersGrammarAction(Type type , char* varname){
+ParametersDef ParametersDefGrammarAction(Type type , char* varname){
 	LogDebug("\tParametersGrammarAction");
 
 	ParametersDef parameters_def = Malloc(sizeof(struct ParametersDefNode));
@@ -316,14 +279,14 @@ ParametersDef ParametersGrammarAction(Type type , char* varname){
 	return parameters_def;
 }
 
-ParametersDef ParametersCommaGrammarAction(Type type , char* varname, ParametersDef parameters_def){
+ParametersDef ParametersDefCommaGrammarAction(Type type , char* varname, ParametersDef to_parameters_def){
 	LogDebug("\tParametersCommaGrammarAction");
 
 	ParametersDef parameters_def = Malloc(sizeof(struct ParametersDefNode));
 	parameters_def->pType = PD_TYPE_VAR_COMMA_PD;
 	parameters_def->type = type;
 	parameters_def->var = varname;
-	parameters_def->parametersdef = parameters_def;
+	parameters_def->parametersdef = to_parameters_def;
 
 	tryInsertIntoSymbolTable(varname,type);
 
@@ -349,13 +312,13 @@ Parameters ParametersGrammarAction(ReturnValue return_value){
 	return parameters;
 }
 
-Parameters ParametersCommaGrammarAction(ReturnValue return_value, Parameters parameters){
+Parameters ParametersCommaGrammarAction(ReturnValue return_value, Parameters to_parameters){
 	LogDebug("\tParametersCommaGrammarAction");
 
 	Parameters parameters = Malloc(sizeof(struct ParametersNode));
 	parameters->pType = P_RETVAL_PARAMS;
 	parameters->returnvalue = return_value;
-	parameters->parameters = parameters;
+	parameters->parameters = to_parameters;
 
 	return parameters;
 }
@@ -393,6 +356,19 @@ Body BodyThisAssignRetGrammarAction(Array array, Assignment assignment, Function
 	return body;
 }
 
+Body BodyThisArrayAssignFuncGrammarAction(Array array, Assignment assignment, Functionvalue functionvalue, Body to_body){
+	LogDebug("\tBodyThisArrayAssignmentFuncGrammarAction");
+
+	Body body = Malloc(sizeof(struct BodyNode));
+	body->bType = BODY_THIS_ARRAY_ASSIGNMENT_FUNC_BODY;
+	body->array = array;
+	body->assignment = assignment;
+	body->functionvalue = functionvalue;
+	body->body = to_body;
+
+	return body;
+}
+
 Body BodyFuncGrammarAction(Functionvalue functionvalue, Body to_body){
 	LogDebug("\tBodyThisArrayAssignmentFuncGrammarAction");
 
@@ -411,6 +387,7 @@ Body BodyThisArrayFuncGrammarAction(Array array,Functionvalue functionvalue ,Bod
 	body->bType = BODY_FUNC_BODY;
 	body->functionvalue = functionvalue;
 	body->body = to_body;
+
 
 	return body;
 }
@@ -548,7 +525,7 @@ VarSingleAction IncrementVarSingleActionGrammarAction(){
 	LogDebug("\tIncrementVarSingleActionGrammarAction");
 
 	VarSingleAction varSingleAction = Malloc(sizeof(struct VarSingleActionNode));
-	varSingleAction->type = INCREMENT;
+	varSingleAction->type = S_INCREMENT;
 
 	return varSingleAction;
 } 
@@ -557,7 +534,7 @@ VarSingleAction DecrementVarSingleActionGrammarAction(){
 	LogDebug("\tDecrementVarSingleActionGrammarAction");
 
 	VarSingleAction varSingleAction = Malloc(sizeof(struct VarSingleActionNode));
-	varSingleAction->type = DECREMENT;
+	varSingleAction->type = S_DECREMENT;
 
 	return varSingleAction;
 }
@@ -697,7 +674,7 @@ ReturnValue  ReturnValueGconstantGrammarAction(GConstant getconstant){
 
 
 ReturnValue ReturnValueThisVarnameArrayGrammarAction(char* varname, Array array){
-	LogDebug("\tReturnValueVarnameArrayGrammarAction");
+	LogDebug("\tReturnValueThisVarnameArrayGrammarAction");
 
 	ReturnValue return_value = Malloc(sizeof(struct ReturnValueNode));
 	return_value->rtType = RT_THIS_VAR_ARRAY;
@@ -791,7 +768,7 @@ Functionvalue FunctionValueGrammarAction(char* varname, Parameters parameters){
 	return functionvalue;
 }
 
-Conditionals WhenBodyGrammarAction(Negation to_negation, Boolean to_boolean, Body to_body){
+Conditionals WhenBodyGrammarAction(Negation to_negation, GSBoolean to_boolean, Body to_body){
 	LogDebug("\tWhenBodyGrammarAction");
 	
 	Conditionals conditionals = Malloc(sizeof(struct ConditionalsNode));
@@ -803,7 +780,7 @@ Conditionals WhenBodyGrammarAction(Negation to_negation, Boolean to_boolean, Bod
 	return conditionals;
 }
 
-Conditionals WhenElseBodyGrammarAction(Negation to_negation, Boolean to_boolean, Body to_firstBody, Body to_secondBody){
+Conditionals WhenElseBodyGrammarAction(Negation to_negation, GSBoolean to_boolean, Body to_firstBody, Body to_secondBody){
 	LogDebug("\tWhenElseBodyGrammarAction");
 	
 	Conditionals conditionals = Malloc(sizeof(struct ConditionalsNode));
@@ -816,7 +793,7 @@ Conditionals WhenElseBodyGrammarAction(Negation to_negation, Boolean to_boolean,
 	return conditionals;
 }
 
-Conditionals IfBodyGrammarAction(Negation to_negation, Boolean to_boolean, Body to_firstBody, IfOptions to_ifOptions){
+Conditionals IfBodyGrammarAction(Negation to_negation, GSBoolean to_boolean, Body to_firstBody, IfOptions to_ifOptions){
 	LogDebug("\tIfBodyGrammarAction");
 	
 	Conditionals conditionals = Malloc(sizeof(struct ConditionalsNode));
@@ -829,7 +806,7 @@ Conditionals IfBodyGrammarAction(Negation to_negation, Boolean to_boolean, Body 
 	return conditionals;
 }
 
-Conditionals ForBodyGrammarAction(char * to_varName, int to_rightValue,Negation to_negation, Boolean to_boolean, ForOptions to_forOptions,Body to_firstBody){
+Conditionals ForBodyGrammarAction(char * to_varName, int to_rightValue,Negation to_negation, GSBoolean to_boolean, ForOptions to_forOptions,Body to_firstBody){
 	LogDebug("\tForBodyGrammarAction");
 	
 	Conditionals conditionals = Malloc(sizeof(struct ConditionalsNode));
@@ -844,7 +821,7 @@ Conditionals ForBodyGrammarAction(char * to_varName, int to_rightValue,Negation 
 	return conditionals;
 }
 
-Conditionals WhileBodyGrammarAction(Negation to_negation, Boolean to_boolean, Body to_firstBody){
+Conditionals WhileBodyGrammarAction(Negation to_negation, GSBoolean to_boolean, Body to_firstBody){
 	LogDebug("\tWhileBodyGrammarAction");
 	
 	Conditionals conditionals = Malloc(sizeof(struct ConditionalsNode));
@@ -967,14 +944,14 @@ IfOptions EmptyIfOptionsGrammarAction(){
 	return if_options;
 }
 
-IfOptions ElifBodyGrammarAction(Boolean boolean, Body body, IfOptions if_options){
+IfOptions ElifBodyGrammarAction(GSBoolean boolean, Body body, IfOptions to_if_options){
 	LogDebug("\tElifBodyGrammarAction");
 
 	IfOptions if_options = Malloc(sizeof(struct IfOptionsNode));
 	if_options->ifOptionsType = IF_OPTIONS_ELIF;
 	if_options->boolean = boolean;
 	if_options->body = body;
-	if_options->ifOptions = if_options;
+	if_options->ifOptions = to_if_options;
 
 	return if_options;
 }
@@ -990,45 +967,45 @@ IfOptions  ElseBodyGrammarAction(Body body){
 }
 
 
-Boolean MinorBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
+GSBoolean MinorBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
 	LogDebug("[Bison] MinorBooleanGrammarAction(%d, %d)", leftmathexp, rightmathexp);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_LESS_THAN;
 	boolean->leftMathExp = leftmathexp;
 	boolean->rightMathExp = rightmathexp;
 	return boolean;
 }
 
-Boolean MajorBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
+GSBoolean MajorBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
 	LogDebug("[Bison] MajorBooleanGrammarAction(%d, %d)", leftmathexp, rightmathexp);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_GREATER_THAN;
 	boolean->leftMathExp = leftmathexp;
 	boolean->rightMathExp = rightmathexp;
 	return boolean;
 }
 
-Boolean MinorEqualBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
+GSBoolean MinorEqualBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
 	LogDebug("[Bison] MinorEqualBooleanGrammarAction(%d, %d)", leftmathexp, rightmathexp);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_LESS_THAN_EQ;
 	boolean->leftMathExp = leftmathexp;
 	boolean->rightMathExp = rightmathexp;
 	return boolean;
 }
 
-Boolean MajorEqualBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
+GSBoolean MajorEqualBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
 	LogDebug("[Bison] MajorEqualBooleanGrammarAction(%d, %d)", leftmathexp, rightmathexp);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_GREATER_THAN_EQ;
 	boolean->leftMathExp = leftmathexp;
 	boolean->rightMathExp = rightmathexp;
 	return boolean;
 }
 
-Boolean EqualBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
+GSBoolean EqualBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
 	LogDebug("[Bison] EqualBooleanGrammarAction(%d, %d)", leftmathexp, rightmathexp);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_EQ_EQ;
 	boolean->leftMathExp = leftmathexp;
 	boolean->rightMathExp = rightmathexp;
@@ -1036,89 +1013,89 @@ Boolean EqualBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
 }
 
 
-Boolean NotEqualBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
+GSBoolean NotEqualBooleanGrammarAction(Mathexp leftmathexp, Mathexp rightmathexp) {
 	LogDebug("[Bison] NotEqualBooleanGrammarAction(%d, %d)", leftmathexp, rightmathexp);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_NOT_EQ;
 	boolean->leftMathExp = leftmathexp;
 	boolean->rightMathExp = rightmathexp;
 	return boolean;
 }
 
-Boolean OrBooleanGrammarAction(Boolean leftboolean, Boolean rightboolean) {
+GSBoolean OrBooleanGrammarAction(GSBoolean leftboolean, GSBoolean rightboolean) {
 	LogDebug("[Bison] OrBooleanGrammarAction(%d, %d)", leftboolean, rightboolean);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_OR;
 	boolean->leftBoolean = leftboolean;
 	boolean->rightBoolean = rightboolean;
 	return boolean;
 }
 
-Boolean AndBooleanGrammarAction(Boolean leftboolean, Boolean rightboolean) {
+GSBoolean AndBooleanGrammarAction(GSBoolean leftboolean, GSBoolean rightboolean) {
 	LogDebug("[Bison] AndBooleanGrammarAction(%d, %d)", leftboolean, rightboolean);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_AND;
 	boolean->leftBoolean = leftboolean;
 	boolean->rightBoolean = rightboolean;
 	return boolean;
 }
 
-Boolean InVarBooleanGrammarAction(char * varname, char * varname2) {
+GSBoolean InVarBooleanGrammarAction(char * varname, char * varname2) {
 	LogDebug("[Bison] InVarBooleanGrammarAction(%d, %d)", varname, varname2);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_V_IN_V;
 	boolean->lefVar = varname;
 	boolean->rightVar = varname2;
 	return boolean;
 }
 
-Boolean InGCBooleanGrammarAction(char * varname, GConstant gconstant) {
+GSBoolean InGCBooleanGrammarAction(char * varname, GConstant gconstant) {
 	LogDebug("[Bison] InGCBooleanGrammarAction(%d, %d)", varname, gconstant);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_V_IN_GC;
 	boolean->lefVar = varname;
 	boolean->gconstant = gconstant;
 	return boolean;
 }
 
-Boolean VarnameBooleanGrammarAction(char * var) {
+GSBoolean VarnameBooleanGrammarAction(char * var) {
 	LogDebug("[Bison] VarnameBooleanGrammarAction(%d)", var);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_VAR;
 	boolean->lefVar = var;
 	return boolean;
 }
 
-Boolean VarnameFuncBooleanGrammarAction(char * var, FunctionAssignment functionAssignment) {
+GSBoolean VarnameFuncBooleanGrammarAction(char * var, FunctionAssignment functionAssignment) {
 	LogDebug("[Bison] VarnameFuncBooleanGrammarAction(%d, %d)", var, functionAssignment);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_FUNA;
 	boolean->lefVar = var;
 	boolean->functionassignment = functionAssignment;
 	return boolean;
 }
 
-Boolean HitsVarBooleanGrammarAction(char * varname, char * varname2) {
+GSBoolean HitsVarBooleanGrammarAction(char * varname, char * varname2) {
 	LogDebug("[Bison] HitsVarBooleanGrammarAction(%d, %d)", varname, varname2);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_V_HITS_V;
 	boolean->lefVar = varname;
 	boolean->rightVar = varname2;
 	return boolean;
 }
 
-Boolean HitsGCBooleanGrammarAction(char * var, GConstant gconstant) {
+GSBoolean HitsGCBooleanGrammarAction(char * var, GConstant gconstant) {
 	LogDebug("[Bison] HitsGCBooleanGrammarAction(%d, %d)", var, gconstant);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_V_HITS_GC;
 	boolean->lefVar = var;
 	boolean->gconstant = gconstant;
 	return boolean;
 }
 
-Boolean ConditionalsBooleanGrammarAction(Conditionals conditionals) {
+GSBoolean ConditionalsBooleanGrammarAction(Conditionals conditionals) {
 	LogDebug("[Bison] ConditionalsBooleanGrammarAction(%d)", conditionals);
-	Boolean boolean = Malloc(sizeof(struct BooleanNode));
+	GSBoolean boolean = Malloc(sizeof(struct GSBooleanNode));
 	boolean->booltype = BOOL_CONDITIONALS;
 	boolean->conditionals = conditionals;
 	return boolean;

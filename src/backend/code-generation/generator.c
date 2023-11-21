@@ -1,20 +1,22 @@
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 #include "../support/logger.h"
 #include "generator.h"
-#include "src\main.c"
+#include "../semantic-analysis/symbol-table.h"
 
 
-
-#define SOURCE_FILE "game.py"
+#define SOURCE_FILENAME "game.py"
 
 FILE * source_file;
 
 void Generator(Program program) {
 	LogDebug("Generating program...");
 
-	source_file = fopen(SOURCE_FILE,"w");
+	source_file = fopen(SOURCE_FILENAME,"w");
 	
 	if (source_file == NULL) {
-		LogError("Could not open file %s", SOURCE_FILE);
+		LogError("Could not open file %s", SOURCE_FILENAME);
 		exit(1);
 	}
 
@@ -74,7 +76,7 @@ void Generator(Program program) {
 void GenerateProgram(Program program) {
 	LogDebug("Generating program...");
 
-	GenerateMainScene(program->main_scene);
+	GenerateMainScene(program->mainscene);
 
 
 	LogDebug("Program generated.");
@@ -82,7 +84,7 @@ void GenerateProgram(Program program) {
 	return;
 }
 
-void GenerateMainScene(MainScene main_scene) {
+void GenerateMainScene(Mainscene main_scene) {
 	LogDebug("Generating main scene...");
 
 	GenerateBody(main_scene->body);
@@ -111,16 +113,16 @@ void GenerateBody(Body body) {
 		case BODY_THIS_ARRAY_ASSIGNMENT_FUNC_BODY:
 			GenerateArray(body->array);
 			GenerateAssignment(body->assignment);
-			GenerateFunctionvalue(body->functionvalue);
+			GenerateFunctionValue(body->functionvalue);
 			GenerateBody(body->body);
 			break;
 		case BODY_FUNC_BODY:
-			GenerateFunctionvalue(body->functionvalue);
+			GenerateFunctionValue(body->functionvalue);
 			GenerateBody(body->body);
 			break;
 		case BODY_THIS_ARRAY_FUNC_BODY:
 			GenerateArray(body->array);
-			GenerateFunctionvalue(body->functionvalue);
+			GenerateFunctionValue(body->functionvalue);
 			GenerateBody(body->body);
 			break;
 		case BODY_TYPE_VARNAME_ARRAY_ASSIGNMENT_CONST_BODY:
@@ -156,7 +158,7 @@ void GenerateBody(Body body) {
 			GenerateVarname(body->var);
 			GenerateArray(body->array);
 			GenerateAssignment(body->assignment);
-			GenerateFunctionvalue(body->functionvalue);
+			GenerateFunctionValue(body->functionvalue);
 			GenerateBody(body->body);
 			break;
 		case BODY_TYPE_VARNAME_ARRAY_ASSIGNMENT_FUNC_BODY:
@@ -164,7 +166,7 @@ void GenerateBody(Body body) {
 			GenerateVarname(body->var);
 			GenerateArray(body->array);
 			GenerateAssignment(body->assignment);
-			GenerateFunctionvalue(body->functionvalue);
+			GenerateFunctionValue(body->functionvalue);
 			GenerateBody(body->body);
 			break;
 		case BODY_VARNAME_ARRAY_VARSINGLE_BODY:
@@ -319,10 +321,10 @@ void GenerateVarSingleAction(VarSingleAction varsingleaction) {
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
 	switch(varsingleaction->type) {
-		case INCREMENT:
+		case S_INCREMENT:
 			fprintf(source_file, "++");
 			break;
-		case DECREMENT:
+		case S_DECREMENT:
 			fprintf(source_file, "--");
 			break;
 	}
@@ -337,20 +339,20 @@ void GenerateAssignment(Assignment assignment) {
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
-	switch(assignment->aType) {
-		case EQUAL:
+	switch(assignment->type) {
+		case ASSIGNMENT_EQUAL:
 			fprintf(source_file, "=");
 			break;
-		case PLUS_EQUAL:
+		case ASSIGNMENT_PLUS_EQUAL:
 			fprintf(source_file, "+=");
 			break;
-		case MINUS_EQUAL:
+		case ASSIGNMENT_MINUS_EQUAL:
 			fprintf(source_file, "-=");
 			break;
-		case MUL_EQUAL:
+		case ASSIGNMENT_MUL_EQUAL:
 			fprintf(source_file, "*=");
 			break;
-		case SLASH_EQUAL:
+		case ASSIGNMENT_SLASH_EQUAL:
 			fprintf(source_file, "/=");
 			break;
 	}
@@ -365,7 +367,7 @@ void GenerateFunctionAssignment(FunctionAssignment functionAssignment) {
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
-	GenerateAssignment(functionAssignment->assignment);
+	GenerateParameters(functionAssignment->parameters);
 
 	LogDebug("FunctionAssignment generated.");
 
@@ -404,7 +406,7 @@ void GenerateReturnValue(ReturnValue returnvalue) {
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
-	switch(returnvalue->rType) {
+	switch(returnvalue->rtType) {
 		case RT_CONSTANT:
 			GenerateConstant(returnvalue->constant);
 			fprintf(source_file, "constant");
@@ -462,7 +464,7 @@ void GenerateValue(Value value) {
 			fprintf(source_file, "type");
 			break;
 		case V_FUNV:
-			GenerateFunctionvalue(value->functionvalue);
+			GenerateFunctionValue(value->functionvalue);
 			fprintf(source_file, "functionvalue");
 			break;
 	} 
@@ -477,7 +479,7 @@ void GenerateFunctionValue(Functionvalue functionvalue) {
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
-	GenerateVarname(functionvalue->var);
+	GenerateVarname(functionvalue->functionName);
 	GenerateParameters(functionvalue->parameters);
 
 	LogDebug("Functionvalue generated.");
@@ -490,7 +492,7 @@ void GenerateConditionals(Conditionals conditionals) {
 		case COND_WHEN:
 			GenerateNegation(conditionals->negation);
 			GenerateBoolean(conditionals->boolean);
-			GenerateBody(conditionals->body);
+			GenerateBody(conditionals->firstBody);
 			break;
 		case COND_WHEN_ELSE:
 			GenerateNegation(conditionals->negation);
@@ -501,7 +503,7 @@ void GenerateConditionals(Conditionals conditionals) {
 		case COND_IF:
 			GenerateNegation(conditionals->negation);
 			GenerateBoolean(conditionals->boolean);
-			GenerateBody(conditionals->body);
+			GenerateBody(conditionals->firstBody);
 			GenerateIfOptions(conditionals->ifoptions);
 			break;
 		case COND_FOR:
@@ -510,12 +512,12 @@ void GenerateConditionals(Conditionals conditionals) {
 			GenerateNegation(conditionals->negation);
 			GenerateBoolean(conditionals->boolean);
 			GenerateForOptions(conditionals->foroptions);
-			GenerateBody(conditionals->body);
+			GenerateBody(conditionals->firstBody);
 			break;
 		case COND_WHILE:
 			GenerateNegation(conditionals->negation);
 			GenerateBoolean(conditionals->boolean);
-			GenerateBody(conditionals->body);
+			GenerateBody(conditionals->firstBody);
 			break; 
 	}
 
@@ -533,10 +535,6 @@ void GenerateNegation(Negation negation) {
 		case N_NOT:
 			fprintf(source_file, "not");
 			break;
-		case N_EXPRESSION:
-			GenerateExpression(negation->expression);
-			fprintf(source_file, "expression");
-			break;
 	}
 
 	LogDebug("Negation generated.");
@@ -549,11 +547,11 @@ void GenerateForOptions(ForOptions foroptions) {
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
-	switch(foroptions->fType) {
-		case F_INCREMENT:
+	switch(foroptions->forOptionsType) {
+		case S_INCREMENT:
 			fprintf(source_file, "increment");
 			break;
-		case F_DECREMENT:
+		case S_DECREMENT:
 			fprintf(source_file, "decrement");
 			break;
 	}
@@ -568,12 +566,11 @@ void GeneratorIfOptions(IfOptions ifoptions) {
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
-	switch(ifoptions->iType) {
-		case I_ELSE:
+	switch(ifoptions->ifOptionsType) {
+		case IF_OPTIONS_ELSE:
 			fprintf(source_file, "else");
 			break;
-		case I_ELSE_IF:
-			GenerateNegation(ifoptions->negation);
+		case IF_OPTIONS_ELIF:
 			GenerateBoolean(ifoptions->boolean);
 			fprintf(source_file, "else_if");
 			break;
@@ -584,30 +581,30 @@ void GeneratorIfOptions(IfOptions ifoptions) {
 	return;
 }
 
-void GeneratorBoolean(Boolean boolean){
+void GeneratorBoolean(GSBoolean boolean){
 	LogDebug("Generating Boolean...");
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
 	switch(boolean->booltype) {
 		case BOOL_LESS_THAN:
-			GenerateMathExpression(boolean->leftMathExpression);
-			GenerateMathExpression(boolean->rightMathExpression);
+			GenerateMathExpression(boolean->leftMathExp);
+			GenerateMathExpression(boolean->rightMathExp);
 			fprintf(source_file, "less_than");
 			break;
 		case BOOL_GREATER_THAN:
-			GenerateMathExpression(boolean->leftMathExpression);
-			GenerateMathExpression(boolean->rightMathExpression);
-			fprintf(source_file, "greaer_than");
+			GenerateMathExpression(boolean->leftMathExp);
+			GenerateMathExpression(boolean->rightMathExp);
+			fprintf(source_file, "greater_than");
 			break;
 		case BOOL_LESS_THAN_EQ:
-			GenerateMathExpression(boolean->leftMathExpression);
-			GenerateMathExpression(boolean->rightMathExpression);
+			GenerateMathExpression(boolean->leftMathExp);
+			GenerateMathExpression(boolean->rightMathExp);
 			fprintf(source_file, "less_than_eq");
 			break;
 		case BOOL_GREATER_THAN_EQ:
-			GenerateMathExpression(boolean->leftMathExpression);
-			GenerateMathExpression(boolean->rightMathExpression);
+			GenerateMathExpression(boolean->leftMathExp);
+			GenerateMathExpression(boolean->rightMathExp);
 			fprintf(source_file, "greater_than_eq");
 			break;
 		case BOOL_EQ_EQ:
@@ -617,17 +614,17 @@ void GeneratorBoolean(Boolean boolean){
 			break;
 		case BOOL_NOT_EQ:
 			GenerateBoolean(boolean->leftMathExp);
-			GenerateBoolean(boolean->leftMathExp);
+			GenerateBoolean(boolean->rightMathExp);
 			fprintf(source_file, "NOT_EQ");
 			break;
 		case BOOL_OR:
-			GenerateBoolean(boolean->leftExpression);
-			GenerateBoolean(boolean->rightExpression);
+			GenerateBoolean(boolean->leftMathExp);
+			GenerateBoolean(boolean->rightMathExp);
 			fprintf(source_file, "OR");
 			break;
 		case BOOL_AND:
-			GenerateBoolean(boolean->leftExpression);
-			GenerateBoolean(boolean->rightExpression);
+			GenerateBoolean(boolean->leftMathExp);
+			GenerateBoolean(boolean->rightMathExp);
 			fprintf(source_file, "AND");
 			break;
 		case BOOL_V_IN_V:
@@ -646,7 +643,7 @@ void GeneratorBoolean(Boolean boolean){
 			break;
 		case BOOL_FUNA:
 			GenerateVarname(boolean->var);
-			GenerateFunctionAssignment(boolean->functionAssignment);
+			GenerateFunctionAssignment(boolean->functionassignment);
 			fprintf(source_file, "fun assignment");
 			break;
 		case BOOL_V_HITS_V:
@@ -671,30 +668,30 @@ void GeneratorBoolean(Boolean boolean){
 
 }
 
-void GeneratorMathExpression(MathExpression mathExpression) {
+void GeneratorMathExpression(Mathexp mathExpression) {
 	LogDebug("Generating MathExpression...");
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
-	switch(mathExpression->mType) {
+	switch(mathExpression->mathExpType) {
 		case MATH_EXP_ADD:
-			GenerateMathExpression(mathExpression->leftMathExpression);
-			GenerateMathExpression(mathExpression->rightMathExpression);
+			GenerateMathExpression(mathExpression->leftMathExp);
+			GenerateMathExpression(mathExpression->rightMathExp);
 			fprintf(source_file, "mathExpression_add");
 			break;
 		case MATH_EXP_SUB:
-			GenerateMathExpression(mathExpression->leftMathExpression);
-			GenerateMathExpression(mathExpression->rightMathExpression);
+			GenerateMathExpression(mathExpression->leftMathExp);
+			GenerateMathExpression(mathExpression->rightMathExp);
 			fprintf(source_file, "mathExpression_sub");
 			break;
 		case MATH_EXP_MUL:
-			GenerateMathExpression(mathExpression->leftMathExpression);
-			GenerateMathExpression(mathExpression->rightMathExpression);
+			GenerateMathExpression(mathExpression->leftMathExp);
+			GenerateMathExpression(mathExpression->rightMathExp);
 			fprintf(source_file, "mathExpression_mul");
 			break;
 		case MATH_EXP_DIV:
-			GenerateMathExpression(mathExpression->leftMathExpression);
-			GenerateMathExpression(mathExpression->rightMathExpression);
+			GenerateMathExpression(mathExpression->leftMathExp);
+			GenerateMathExpression(mathExpression->rightMathExp);
 			fprintf(source_file, "mathExpression_div");
 			break;
 		case MATH_EXP_FACTOR:
@@ -713,7 +710,7 @@ void GenerateFactor(Factor factor) {
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
-	switch(factor->fType) {
+	switch(factor->factorType) {
 		case FACTOR_MATH_EXP:
 			GenerateMathExpression(factor->mathexp);
 			fprintf(source_file,"factor_math_exp");
@@ -768,7 +765,7 @@ void GenerateGConstant(GConstant gconstant) {
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
 
-	switch(gconstant->gType) {
+	switch(gconstant->gcType) {
 		case GC_UP_B:
 			fprintf(source_file, "UP_BORDER");
 			break;
@@ -856,4 +853,86 @@ void GenerateString(char * str) {
 	LogDebug("String generated.");
 
 	return;
+}
+
+void GenerateBoolean(GSBoolean to_boolean) {
+	LogDebug("Generating Boolean...");
+
+	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
+
+	switch(to_boolean->booltype) {
+		case BOOL_LESS_THAN:
+			GenerateMathExpression(to_boolean->leftMathExp);
+			GenerateMathExpression(to_boolean->rightMathExp);
+			fprintf(source_file, "less_than");
+			break;
+		case BOOL_GREATER_THAN:
+			GenerateMathExpression(to_boolean->leftMathExp);
+			GenerateMathExpression(to_boolean->rightMathExp);
+			fprintf(source_file, "greater_than");
+			break;
+		case BOOL_LESS_THAN_EQ:
+			GenerateMathExpression(to_boolean->leftMathExp);
+			GenerateMathExpression(to_boolean->rightMathExp);
+			fprintf(source_file, "less_than_eq");
+			break;
+		case BOOL_GREATER_THAN_EQ:
+			GenerateMathExpression(to_boolean->leftMathExp);
+			GenerateMathExpression(to_boolean->rightMathExp);
+			fprintf(source_file, "greater_than_eq");
+			break;
+		case BOOL_EQ_EQ:
+			GenerateBoolean(to_boolean->leftMathExp);
+			GenerateBoolean(to_boolean->rightMathExp);
+			fprintf(source_file, "EQ_EQ");
+			break;
+		case BOOL_NOT_EQ:
+			GenerateBoolean(to_boolean->leftMathExp);
+			GenerateBoolean(to_boolean->rightMathExp);
+			fprintf(source_file, "NOT_EQ");
+			break;
+		case BOOL_OR:
+			GenerateBoolean(to_boolean->leftMathExp);
+			GenerateBoolean(to_boolean->rightMathExp);
+			fprintf(source_file, "OR");
+			break;
+		case BOOL_AND:
+			GenerateBoolean(to_boolean->leftMathExp);
+			GenerateBoolean(to_boolean->rightMathExp);
+			fprintf(source_file, "AND");
+			break;
+		case BOOL_V_IN_V:
+			GenerateVarname(to_boolean->lefVar);
+			GenerateVarname(to_boolean->rightVar);
+			fprintf(source_file, "v IN v");
+			break;
+		case BOOL_V_IN_GC:
+			GenerateVarname(to_boolean->lefVar);
+			GenerateVarname(to_boolean->rightVar);
+			fprintf(source_file, "v IN gc");
+			break;
+		case BOOL_VAR:
+			GenerateVarname(to_boolean->var);
+			fprintf(source_file, "var");
+			break;
+		case BOOL_FUNA:
+			GenerateVarname(to_boolean->var);
+			GenerateFunctionAssignment(to_boolean->functionassignment);
+			fprintf(source_file, "fun assignment");
+			break;
+		case BOOL_V_HITS_V:
+			GenerateVarname(to_boolean->lefVar);
+			GenerateVarname(to_boolean->rightVar);
+			fprintf(source_file, "v_hits_v");
+			break;
+		case BOOL_V_HITS_GC:
+			GenerateVarname(to_boolean->lefVar);
+			GenerateVarname(to_boolean->gconstant);
+			fprintf(source_file, "v_hits_gc");
+			break;
+		case BOOL_CONDITIONALS:
+			GenerateConditionals(to_boolean->conditionals);
+			fprintf(source_file, "conditional");
+			break;
+		}
 }

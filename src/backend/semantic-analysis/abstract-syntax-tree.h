@@ -7,7 +7,7 @@ typedef struct ExpressionNode *Expression;
 typedef struct FactorNode *Factor;
 typedef struct ConstantNode *Constant;
 typedef struct ConditionalsNode *Conditionals;
-typedef struct BooleanNode *Boolean;
+typedef struct GSBooleanNode *GSBoolean;
 typedef struct FunctionNode *Function;
 typedef struct TypeNode *Type;
 typedef struct ParametersDefNode *ParametersDef;
@@ -26,6 +26,8 @@ typedef struct GConstantNode *GConstant;
 typedef struct FunctionAssignmentNode *FunctionAssignment;
 typedef struct ForOptionsNode *ForOptions;
 typedef struct IfOptionsNode *IfOptions;
+typedef struct StrNode *Str;
+typedef struct CharacterNode *Character;
 
 struct ProgramNode
 {
@@ -113,7 +115,7 @@ struct ConditionalsNode
 	Body firstBody;
 	Body secondBody;
 	Negation negation;
-	Boolean boolean;
+	GSBoolean boolean;
 	char * varName;
 	int rightValue;
 	ForOptions foroptions;
@@ -240,8 +242,8 @@ struct ConstantNode
 
 typedef enum
 {
-	INCREMENT,
-	DECREMENT
+	S_INCREMENT,
+	S_DECREMENT
 } SingleActionType;
 
 struct VarSingleActionNode
@@ -321,15 +323,15 @@ typedef enum
 	BOOL_CONDITIONALS
 } BooleanType;
 
-struct BooleanNode
+struct GSBooleanNode
 {
 	BooleanType booltype;
 	Mathexp leftMathExp;
 	Mathexp rightMathExp;
-	Boolean leftBoolean;
+	GSBoolean leftBoolean;
 	char *lefVar;
 	char *rightVar;
-	Boolean rightBoolean;
+	GSBoolean rightBoolean;
 	char *var;
 	GConstant gconstant;
 	FunctionAssignment functionassignment;
@@ -361,7 +363,7 @@ typedef enum{
 
 struct IfOptionsNode{
 	Body body;
-	Boolean boolean;
+	GSBoolean boolean;
 	IfOptions ifOptions;
 	IfOptionsType ifOptionsType;
 };

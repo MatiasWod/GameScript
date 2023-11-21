@@ -2,6 +2,6 @@
 #define GENERATOR_HEADER
 #include "../semantic-analysis/abstract-syntax-tree.h"
 
-void Generator(int result);
+void Generator(Program program);
 
 #endif

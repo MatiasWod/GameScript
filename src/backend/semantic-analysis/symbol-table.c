@@ -164,3 +164,43 @@ void StepIntoScope() {
 void LeaveScope() {
     scope--;
 }
+
+void tryInsertIntoSymbolTable(char *name, Type type){
+		if(!SymbolTableContains(name)){
+		switch (type->tType)
+		{
+		case T_INT:
+			InsertInSymbolTable(name, VARTYPE_INT);
+			break;
+		case T_TEXT:
+			InsertInSymbolTable(name, VARTYPE_TEXT);
+			break;
+		case T_BOOL:
+			InsertInSymbolTable(name, VARTYPE_BOOL);
+			break;
+		case T_CHAR:
+			InsertInSymbolTable(name, VARTYPE_CHAR);
+			break;
+		case T_RGB:
+			InsertInSymbolTable(name, VARTYPE_RGB);
+			break;
+		case T_BLOCK:
+			InsertInSymbolTable(name, VARTYPE_BLOCK);
+			break;
+		case T_GOBJECT:
+			InsertInSymbolTable(name, VARTYPE_GOBJECT);
+			break;
+		case T_SCENE:
+			InsertInSymbolTable(name, VARTYPE_SCENE);
+			break;
+		case T_BUTTON:
+			InsertInSymbolTable(name, VARTYPE_BUTTON);
+			break;
+		case T_STRING:
+			InsertInSymbolTable(name, VARTYPE_STRING);
+			break;
+		default:
+			break;
+		}
+	}
+}

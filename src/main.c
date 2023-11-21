@@ -7,8 +7,17 @@
 // Estado de la aplicación.
 CompilerState state;
 
+typedef struct Node * List;
+
+struct Node {
+    void * ptr;
+    List next;
+};
+
+
 //TODO MOVER DE ACA
 void FreeAll() {
+	List allocated_memory = NULL;
     while (allocated_memory != NULL) {
         List to_free = allocated_memory;
         allocated_memory = to_free->next;
@@ -24,7 +33,6 @@ const int main(const int argumentCount, const char ** arguments) {
 	state.errors = NULL;
 	state.last_error = NULL;
 	state.error_count = 0;
-	state.result = 0;
 	state.succeed = false;
 	state.game_generation = false;
 
