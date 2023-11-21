@@ -11,6 +11,8 @@
  * abstracta (i.e., el AST).
  */
 
+void tryInsertIntoSymbolTable(char *name, Type type);
+
 // Programa.
 
 Program ProgramGrammarAction(Mainscene mainscene);

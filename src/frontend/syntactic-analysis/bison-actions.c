@@ -1,5 +1,6 @@
 #include "../../backend/domain-specific/calculator.h"
 #include "../../backend/support/logger.h"
+#include "../../backend/semantic-analysis/symbol-table.h"
 #include "bison-actions.h"
 #include <stdio.h>
 #include <string.h>
@@ -11,6 +12,49 @@
 /**
  * Esta función se ejecuta cada vez que se emite un error de sintaxis.
  */
+
+void tryInsertIntoSymbolTable(char *name, Type type){
+		if(!SymbolTableContains(name)){
+		switch (type->tType)
+		{
+		case T_INT:
+			InsertInSymbolTable(name, VARTYPE_INT);
+			break;
+		case T_TEXT:
+			InsertInSymbolTable(name, VARTYPE_TEXT);
+			break;
+		case T_BOOL:
+			InsertInSymbolTable(name, VARTYPE_BOOL);
+			break;
+		case T_CHAR:
+			InsertInSymbolTable(name, VARTYPE_CHAR);
+			break;
+		case T_RGB:
+			InsertInSymbolTable(name, VARTYPE_RGB);
+			break;
+		case T_BLOCK:
+			InsertInSymbolTable(name, VARTYPE_BLOCK);
+			break;
+		case T_GOBJECT:
+			InsertInSymbolTable(name, VARTYPE_GOBJECT);
+			break;
+		case T_SCENE:
+			InsertInSymbolTable(name, VARTYPE_SCENE);
+			break;
+		case T_BUTTON:
+			InsertInSymbolTable(name, VARTYPE_BUTTON);
+			break;
+		case T_STRING:
+			InsertInSymbolTable(name, VARTYPE_STRING);
+			break;
+		default:
+			break;
+		}
+	}
+
+}
+
+ 
 typedef struct Node * List;
 
 struct Node {
@@ -61,7 +105,7 @@ int ConditionalsGrammarAction()
 Program ProgramGrammarAction(Mainscene mainscene)
 {
 	LogDebug("[Bison] ProgramGrammarAction()");
-		/*
+	/*
 	 * "state" es una variable global que almacena el estado del compilador,
 	 * cuyo campo "succeed" indica si la compilación fue o no exitosa, la cual
 	 * es utilizada en la función "main".
@@ -75,6 +119,9 @@ Program ProgramGrammarAction(Mainscene mainscene)
 	 * la expresión se computa on-the-fly, y es la razón por la cual esta
 	 * variable es un simple entero, en lugar de un nodo.
 	 */
+	state.succeed = state.error_count == 0;
+	state.program = program;
+
 	return program;
 }
 
@@ -135,11 +182,14 @@ Constante ConstanteGrammarAction(Value value){
 Function FunctionGrammarAction(Type to_type, char * fun_name, ParametersDef parameters_def, Body to_body){
 	LogDebug("\tFunctionGrammarAction");
 
+	
 	Function function = Malloc(sizeof(struct FunctionNode));
 	function->type = to_type;
 	function->var = fun_name;
 	function->parameters_def = parameters_def;
 	function->body = to_body;
+
+	tryInsertIntoSymbolTable(fun_name,to_type);
 
 	return function;
 }
@@ -261,6 +311,8 @@ ParametersDef ParametersGrammarAction(Type type , char* varname){
 	parameters_def->type = type;
 	parameters_def->var = varname;
 
+	tryInsertIntoSymbolTable(varname,type);
+
 	return parameters_def;
 }
 
@@ -272,6 +324,8 @@ ParametersDef ParametersCommaGrammarAction(Type type , char* varname, Parameters
 	parameters_def->type = type;
 	parameters_def->var = varname;
 	parameters_def->parametersdef = parameters_def;
+
+	tryInsertIntoSymbolTable(varname,type);
 
 	return parameters_def;
 } 
@@ -368,6 +422,12 @@ Body BodyTypeAssignConstGrammarAction(Type type, char * varname, Array array, As
 	body->bType = BODY_THIS_ARRAY_FUNC_BODY;
 	body->array = array;
 	body->body = to_body;
+	body->type = type;
+	body->var = varname;
+	body->assignment = assignment;
+	body->constant = constant;
+
+	tryInsertIntoSymbolTable(varname,type);
 
 	return body;
 }
@@ -381,6 +441,8 @@ Body BodyTypeArrayGrammarAction(Type type, char* varname, Array array, Body to_b
 	body->var = varname;
 	body->array = array;
 	body->body = to_body;
+
+	tryInsertIntoSymbolTable(varname,type);
 
 	return body;
 }
@@ -396,6 +458,9 @@ Body BodyTypeArrayAssignStringGrammarAction(Type type, char* varname, Array arra
 	body->body = to_body;
 	body->assignment = assignment;
 	body->str = str;
+
+	tryInsertIntoSymbolTable(varname,type);
+
 	return body;
 }
 
@@ -438,6 +503,8 @@ Body BodyTypeVarArrayAssignFuncGrammarAction(Type type, char* varname, Array arr
 	body->assignment = assignment;
 	body->functionvalue = functionvalue;
 	body->body = to_body;
+
+	tryInsertIntoSymbolTable(varname,type);
 
 	return body;
 }
