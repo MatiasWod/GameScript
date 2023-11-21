@@ -30,12 +30,12 @@ const int main(const int argumentCount, const char ** arguments) {
 
 	// Checkeamos que unicamente se ponga el path del archivo a correr, sin argumentos
 
-	if (argumentCount != 1) {
-		LogError("Cantidad de argumentos invalida. Se esperaba unicamente el path del archivo a correr.");
-		return -1;
+	if (argumentCount == 1) {
+		state.game_generation = true;
 	}
 	else {
-		state.game_generation = true;
+		LogError("Cantidad de argumentos invalida. Se esperaba unicamente el path del archivo a correr.");
+		return -1;
 	}
 
 	// Mostrar parámetros recibidos por consola.

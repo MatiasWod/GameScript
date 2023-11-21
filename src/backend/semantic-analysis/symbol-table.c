@@ -83,7 +83,7 @@ int hash_code(char * string) {
 	return hash % HASH_TABLE_SIZE;
 }
 
-void InsertInSymbolTable(char * varname, VarType type, void * value) {
+void InsertInSymbolTable(char * varname, VarType type) {
     if (contains(varname)) {
         DeleteFromSymbolTable(varname);
     }

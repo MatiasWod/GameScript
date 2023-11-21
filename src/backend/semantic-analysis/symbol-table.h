@@ -25,7 +25,7 @@ struct SymbolNode {
 
 typedef struct SymbolNode * Symbol;
 
-void InsertInSymbolTable(char * varname, VarType type, void * value);
+void InsertInSymbolTable(char * varname, VarType type);
 void DeleteFromSymbolTable(char * key);
 Symbol GetFromSymbolTable(char * key);
 boolean SymbolTableContains(char * key);
