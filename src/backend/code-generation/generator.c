@@ -25,13 +25,23 @@ struct functionType
 	char type[MAX_TYPE];
 	char parameters[MAX_PARAMS];
 	char body[MAX_BODY];
-} function;
+};
+typedef struct functionType function;
 
 struct pyvar
 {
 	char name[MAX_VARNAME];
 	Type type;
-} variable;
+};
+typedef struct pyvar variable;
+
+struct rgbType
+{
+	int r;
+	int g;
+	int b;
+};
+typedef struct rgbType rgb;
 
 struct blockType
 {
@@ -41,14 +51,8 @@ struct blockType
 	char left;
 	char up;
 	char down;
-} block;
-
-struct rgbType
-{
-	int r;
-	int g;
-	int b;
-} rgb;
+};
+typedef struct blockType block;
 
 struct textType
 {
@@ -56,7 +60,8 @@ struct textType
 	rgb color;
 	int x;
 	int y;
-} text;
+};
+typedef struct textType text;
 
 struct buttonsType
 {
@@ -65,15 +70,17 @@ struct buttonsType
 	int y;
 	rgb color;
 	function OnClick;
-} button;
+};
+typedef struct buttonsType button;
 
 struct conditionalType
 {
 	char name[MAX_VARNAME];
 	char type[MAX_COND_TYPE];
-} condition;
+};
+typedef struct conditionalType condition;
 
-pyvar * variables;
+variable * variables;
 int variables_count = 0;
 // hola,block  pedro,text  hola2,block
 // hola,hola2 (BLOCK)
@@ -393,8 +400,6 @@ void GenerateType(Type type)
 		fprintf(source_file, "rgb ");
 		break;
 	case T_BLOCK:
-		blocks[block_count].name = strcat("block_%d", block_count);)
-		fprintf(source_file, "def draw_");
 		break;
 	case T_GOBJECT:
 		fprintf(source_file, "gobject ");
