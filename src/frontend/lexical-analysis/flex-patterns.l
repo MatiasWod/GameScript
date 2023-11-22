@@ -124,9 +124,9 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 
  /* {letter}{var}*                              { return VarPatternAction(yytext,yyleng);} */
 "\""                                        { BEGIN(STRING);  return QuotePatternAction();  }
-<STRING>{allcharacters}+								    { return StringTextPatternAction(yytext,yyleng); /*todo*/ }
+<STRING>{allcharacters}+								    { return StringTextPatternAction(yytext,yyleng);  }
 <STRING>"\""								{  BEGIN(INITIAL); return QuotePatternAction();   }
-<STRING>.								{ IgnoredPatternAction(yytext, yyleng); /*todo*/ }
+<STRING>.								{ IgnoredPatternAction(yytext, yyleng);  }
 "return"                                    { return ReturnPatternAction(); }
 "\'"{letter}"\'"                            { return CharTextPatternAction(yytext,yyleng); }
 
@@ -148,6 +148,12 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 "mainScene"                                { return MainScenePatternAction(); }
 {letter}{var}*"."{letter}{var}*                   { return VarPatternAction(yytext, yyleng); }
 {letter}{var}*                                    { return VarPatternAction(yytext, yyleng); }
+
+"TRUE"                                    { return TruePatternAction();}
+"FALSE"                                   { return FalsePatternAction(); }
+"NULL"                                 { return NullPatternAction(); }
+{letter}{var}*									{ return VarnamePatternAction(yytext, yyleng); }
+{whitespace}+								{ IgnoredPatternAction(yytext, yyleng); }
  /* {letter}{var}+"."{letter}{var}+"("{params}")"      { return FunctionPatternAction(yytext, yyleng); } */
 
 ";"                                        { return SemicolonPatternAction(); }
@@ -155,19 +161,7 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 "."                                     { return DotPatternAction(); }
 
 
-"true"                                     { return TruePatternAction(); }
-"TRUE"                                    { return TruePatternAction();}
-"false"                                    { return FalsePatternAction(); }
-"FALSE"                                   { return FalsePatternAction(); }
 
-
-"NULL"                                 { return NullPatternAction(); }
-"null"                                 { return NullPatternAction(); }
-
-
-
-{letter}{var}*									{ return VarnamePatternAction(yytext, yyleng); }
-{whitespace}+								{ IgnoredPatternAction(yytext, yyleng); }
 .											{ return UnknownPatternAction(yytext, yyleng); }
 
  /* {letter}+                                   { return LetterPatternAction(yytext, yyleng); } */
@@ -175,5 +169,3 @@ params         (string|char|{letter}{var}+)(,{justspace}*(string|char|{letter}{v
 
 
 %%
-
-

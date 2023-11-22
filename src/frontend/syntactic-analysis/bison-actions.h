@@ -3,6 +3,7 @@
 
 #include "../../backend/support/shared.h"
 #include "../../backend/semantic-analysis/abstract-syntax-tree.h"
+#include "../../backend/semantic-analysis/symbol-table.h"
 
 /**
  * Se definen las acciones a ejecutar sobre cada regla de producción de la
@@ -65,7 +66,7 @@ Body BodyEmptyGrammarAction();
 
 Body BodyConditionalsGrammarAction(Conditionals conditionals, Body to_body);
 
-Body BodyThisAssignRetGrammarAction(Array array, Assignment assignment, Functionvalue functionvalue, Body to_body);
+Body BodyThisAssignRetGrammarAction(Array array, Assignment assignment, ReturnValue returnValue, Body to_body);
 
 Body BodyFuncGrammarAction(Functionvalue functionvalue, Body to_body);
 

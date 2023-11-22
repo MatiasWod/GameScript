@@ -3,6 +3,7 @@
 
 #include "../../backend/support/shared.h"
 #include "../syntactic-analysis/bison-parser.h"
+#include "../../backend/semantic-analysis/symbol-table.h"
 
 /**
  * Se definen las acciones a ejecutar sobre cada patrón hallado mediante el
@@ -122,5 +123,6 @@ token LeftPatternAction();
 token SpacePatternAction();
 token EnterPatternAction();
 token OnclickPatternAction();
+token QuotePatternAction();
 
 #endif

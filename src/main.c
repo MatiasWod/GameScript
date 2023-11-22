@@ -3,28 +3,10 @@
 #include "backend/support/shared.h"
 #include "frontend/syntactic-analysis/bison-parser.h"
 #include <stdio.h>
-
+#include <stdlib.h>
+#include "backend/support/utils.h"
 // Estado de la aplicación.
 CompilerState state;
-
-typedef struct Node * List;
-
-struct Node {
-    void * ptr;
-    List next;
-};
-
-
-//TODO MOVER DE ACA
-void FreeAll() {
-	List allocated_memory = NULL;
-    while (allocated_memory != NULL) {
-        List to_free = allocated_memory;
-        allocated_memory = to_free->next;
-        free(to_free->ptr);
-        free(to_free);
-    }
-}
 
 // Punto de entrada principal del compilador.
 const int main(const int argumentCount, const char ** arguments) {

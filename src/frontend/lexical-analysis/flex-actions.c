@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include "../../backend/semantic-analysis/symbol-table.h"
 #include "../../backend/support/logger.h"
 #include "flex-actions.h"
 

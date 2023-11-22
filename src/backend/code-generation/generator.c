@@ -1,6 +1,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <sys/wait.h>
 #include "../support/logger.h"
 #include "generator.h"
 #include "../semantic-analysis/symbol-table.h"
@@ -101,31 +103,40 @@ void GenerateBody(Body body) {
 
 	switch (body->bType) {
 		case BODY_CONDITIONALS_BODY:
+			LogDebug("Generating conditionals body...");
 			GenerateConditionals(body->conditionals);
 			GenerateBody(body->body);
 			break;
 		case BODY_THIS_ARRAY_ASSIGNMENT_RET_BODY:
+			LogDebug("Generating this array assignment return body...");
 			GenerateArray(body->array);
 			GenerateAssignment(body->assignment);
 			GenerateReturnValue(body->returnvalue);
 			GenerateBody(body->body);
 			break;
 		case BODY_THIS_ARRAY_ASSIGNMENT_FUNC_BODY:
+			LogDebug("Generating this array assignment function body...");
 			GenerateArray(body->array);
 			GenerateAssignment(body->assignment);
 			GenerateFunctionValue(body->functionvalue);
 			GenerateBody(body->body);
 			break;
 		case BODY_FUNC_BODY:
+			LogDebug("Generating function body...");
 			GenerateFunctionValue(body->functionvalue);
 			GenerateBody(body->body);
 			break;
 		case BODY_THIS_ARRAY_FUNC_BODY:
+			LogDebug("Generating this array function body...");
+			LogDebug("body->array: %p", body->array);
 			GenerateArray(body->array);
+			//hacemos logdebug del valor de bodu->functionvalue
+			LogDebug("body->functionvalue: %p", body->functionvalue);
 			GenerateFunctionValue(body->functionvalue);
 			GenerateBody(body->body);
 			break;
 		case BODY_TYPE_VARNAME_ARRAY_ASSIGNMENT_CONST_BODY:
+			LogDebug("Generating type varname array assignment constant body...");
 			GenerateType(body->type);
 			GenerateVarname(body->var);
 			GenerateArray(body->array);
@@ -134,12 +145,14 @@ void GenerateBody(Body body) {
 			GenerateBody(body->body);
 			break;
 		case BODY_TYPE_VARNAME_ARRAY_BODY:
+			LogDebug("Generating type varname array body...");
 			GenerateType(body->type);
 			GenerateVarname(body->var);
 			GenerateArray(body->array);
 			GenerateBody(body->body);
 			break;
 		case BODY_TYPE_VARNAME_ARRAY_ASSIGNMENT_STRING_BODY:
+			LogDebug("Generating type varname array assignment string body...");
 			GenerateType(body->type);
 			GenerateVarname(body->var);
 			GenerateArray(body->array);
@@ -148,6 +161,7 @@ void GenerateBody(Body body) {
 			GenerateBody(body->body);
 			break;
 		case BODY_VARNAME_ARRAY_ASSIGNMENT_CONST_BODY:
+			LogDebug("Generating varname array assignment constant body...");
 			GenerateVarname(body->var);
 			GenerateArray(body->array);
 			GenerateAssignment(body->assignment);
@@ -155,6 +169,7 @@ void GenerateBody(Body body) {
 			GenerateBody(body->body);
 			break;
 		case BODY_VARNAME_ARRAY_ASSIGNMENT_FUNC_BODY:
+			LogDebug("Generating varname array assignment function body...");
 			GenerateVarname(body->var);
 			GenerateArray(body->array);
 			GenerateAssignment(body->assignment);
@@ -162,6 +177,7 @@ void GenerateBody(Body body) {
 			GenerateBody(body->body);
 			break;
 		case BODY_TYPE_VARNAME_ARRAY_ASSIGNMENT_FUNC_BODY:
+			LogDebug("Generating type varname array assignment function body...");
 			GenerateType(body->type);
 			GenerateVarname(body->var);
 			GenerateArray(body->array);
@@ -170,15 +186,18 @@ void GenerateBody(Body body) {
 			GenerateBody(body->body);
 			break;
 		case BODY_VARNAME_ARRAY_VARSINGLE_BODY:
+			LogDebug("Generating varname array varsingle body...");
 			GenerateVarname(body->var);
 			GenerateArray(body->array);
 			GenerateVarSingleAction(body->varsingleaction);
 			GenerateBody(body->body);
 			break;
 		case BODY_RETURN_RET:
+			LogDebug("Generating return return body...");
 			GenerateReturnValue(body->returnvalue);
 			break;
 		case BODY_ONCLICK:
+			LogDebug("Generating onclick body...");
 			GenerateFunctionValue(body->functionvalue);
 			GenerateBody(body->body);
 			break;
@@ -198,7 +217,7 @@ void GenerateExpression(Expression expression) {
 			GenerateExpression(expression->expression);
 			break;
 		case EXP_CONST_EXP:
-			GenerateConstant(expression->constante);
+			GenerateConstante(expression->constante);
 			GenerateExpression(expression->expression);
 			break;
 	}
@@ -394,6 +413,9 @@ void GenerateArray(Array array) {
 		    GenerateArray(array->array);
 			fprintf(source_file, "array");
 			break;
+		case ARRAY_LAMBDA:
+			LogDebug("Array Lambda not implemented.");
+			break;
 	}
 
 	LogDebug("Array generated.");
@@ -476,9 +498,7 @@ void GenerateValue(Value value) {
 
 void GenerateFunctionValue(Functionvalue functionvalue) {
 	LogDebug("Generating Functionvalue...");
-
-	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
-
+	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINT
 	GenerateVarname(functionvalue->functionName);
 	GenerateParameters(functionvalue->parameters);
 
@@ -561,7 +581,7 @@ void GenerateForOptions(ForOptions foroptions) {
 	return;
 }
 
-void GeneratorIfOptions(IfOptions ifoptions) {
+void GenerateIfOptions(IfOptions ifoptions) {
 	LogDebug("Generating IfOptions...");
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
@@ -581,7 +601,7 @@ void GeneratorIfOptions(IfOptions ifoptions) {
 	return;
 }
 
-void GeneratorBoolean(GSBoolean boolean){
+void GenerateGSBoolean(GSBoolean boolean){
 	LogDebug("Generating Boolean...");
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
@@ -608,23 +628,23 @@ void GeneratorBoolean(GSBoolean boolean){
 			fprintf(source_file, "greater_than_eq");
 			break;
 		case BOOL_EQ_EQ:
-			GenerateBoolean(boolean->leftMathExp);
-			GenerateBoolean(boolean->rightMathExp);
+			GenerateBoolean(boolean->leftBoolean);
+			GenerateBoolean(boolean->rightBoolean);
 			fprintf(source_file, "EQ_EQ");
 			break;
 		case BOOL_NOT_EQ:
-			GenerateBoolean(boolean->leftMathExp);
-			GenerateBoolean(boolean->rightMathExp);
+			GenerateBoolean(boolean->leftBoolean);
+			GenerateBoolean(boolean->rightBoolean);
 			fprintf(source_file, "NOT_EQ");
 			break;
 		case BOOL_OR:
-			GenerateBoolean(boolean->leftMathExp);
-			GenerateBoolean(boolean->rightMathExp);
+			GenerateBoolean(boolean->leftBoolean);
+			GenerateBoolean(boolean->rightBoolean);
 			fprintf(source_file, "OR");
 			break;
 		case BOOL_AND:
-			GenerateBoolean(boolean->leftMathExp);
-			GenerateBoolean(boolean->rightMathExp);
+			GenerateBoolean(boolean->leftBoolean);
+			GenerateBoolean(boolean->rightBoolean);
 			fprintf(source_file, "AND");
 			break;
 		case BOOL_V_IN_V:
@@ -653,7 +673,7 @@ void GeneratorBoolean(GSBoolean boolean){
 			break;
 		case BOOL_V_HITS_GC:
 			GenerateVarname(boolean->lefVar);
-			GenerateVarname(boolean->gconstant);
+			GenerateVarname(boolean->rightVar);
 			fprintf(source_file, "v_hits_gc");
 			break;
 		case BOOL_CONDITIONALS:
@@ -668,7 +688,7 @@ void GeneratorBoolean(GSBoolean boolean){
 
 }
 
-void GeneratorMathExpression(Mathexp mathExpression) {
+void GenerateMathExpression(Mathexp mathExpression) {
 	LogDebug("Generating MathExpression...");
 
 	//TODO ACA HAY TERMINALES ASI QUE TENEMOS QUE HACER FPRINTF
@@ -882,23 +902,23 @@ void GenerateBoolean(GSBoolean to_boolean) {
 			fprintf(source_file, "greater_than_eq");
 			break;
 		case BOOL_EQ_EQ:
-			GenerateBoolean(to_boolean->leftMathExp);
-			GenerateBoolean(to_boolean->rightMathExp);
+			GenerateBoolean(to_boolean->leftBoolean);
+			GenerateBoolean(to_boolean->rightBoolean);
 			fprintf(source_file, "EQ_EQ");
 			break;
 		case BOOL_NOT_EQ:
-			GenerateBoolean(to_boolean->leftMathExp);
-			GenerateBoolean(to_boolean->rightMathExp);
+			GenerateBoolean(to_boolean->leftBoolean);
+			GenerateBoolean(to_boolean->rightBoolean);
 			fprintf(source_file, "NOT_EQ");
 			break;
 		case BOOL_OR:
-			GenerateBoolean(to_boolean->leftMathExp);
-			GenerateBoolean(to_boolean->rightMathExp);
+			GenerateBoolean(to_boolean->leftBoolean);
+			GenerateBoolean(to_boolean->rightBoolean);
 			fprintf(source_file, "OR");
 			break;
 		case BOOL_AND:
-			GenerateBoolean(to_boolean->leftMathExp);
-			GenerateBoolean(to_boolean->rightMathExp);
+			GenerateBoolean(to_boolean->leftBoolean);
+			GenerateBoolean(to_boolean->rightBoolean);
 			fprintf(source_file, "AND");
 			break;
 		case BOOL_V_IN_V:
@@ -927,7 +947,7 @@ void GenerateBoolean(GSBoolean to_boolean) {
 			break;
 		case BOOL_V_HITS_GC:
 			GenerateVarname(to_boolean->lefVar);
-			GenerateVarname(to_boolean->gconstant);
+			GenerateVarname(to_boolean->rightVar);
 			fprintf(source_file, "v_hits_gc");
 			break;
 		case BOOL_CONDITIONALS:

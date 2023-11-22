@@ -1,0 +1,6 @@
+El compilador de C es GCC.
+../src/frontend/lexical-analysis/flex-patterns.l:153: warning, rule cannot be matched
+../src/frontend/lexical-analysis/flex-patterns.l:154: warning, rule cannot be matched
+../src/frontend/lexical-analysis/flex-patterns.l:155: warning, rule cannot be matched
+../src/frontend/lexical-analysis/flex-patterns.l:156: warning, rule cannot be matched
+../src/frontend/lexical-analysis/flex-patterns.l:172: warning, -s option given but default rule can be matched

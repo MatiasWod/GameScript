@@ -33,8 +33,8 @@
 	Value value;
 	Functionvalue functionvalue;
 	Mathexp mathexp;
-	Str str;
-	Character character;
+	char * str;
+	char character;
 	Constante constante;
 	Array array;
 	Assignment assignment;
@@ -113,7 +113,7 @@
 %token <token> WHEN
 %token <token> IF
 %token <token> RETURN
-%token <token> VARNAME
+%token <str> VARNAME
 // %token <token> FUNCTION
 
 // %token <token> NAME
@@ -204,7 +204,7 @@ type: INT															{ $$ = IntTypeGrammarAction(); }
 	| GOBJECT														{ $$ = GObjectTypeGrammarAction(); }
 	| SCENE															{ $$ = SceneTypeGrammarAction(); }
 	| BUTTON														{ $$ = ButtonTypeGrammarAction(); }
-	| STRING 														{ $$ = StringGrammarAction(); }
+	| STRING 														{ $$ = StringTypeGrammarAction(); }
 	;
 
 parameters_def: %empty													{ $$ = EmptyParametersDefGrammarAction(); }
@@ -258,11 +258,11 @@ returnValue: constant													{ $$ = ReturnValueGrammarAction($1); }
 	| CHAR_TEXT														 { $$ = ReturnValueCharTextGrammarAction(); }
 	| gconstant															{ $$ =  ReturnValueGconstantGrammarAction($1); }
 	| THIS VARNAME array													{ $$ = ReturnValueThisVarnameArrayGrammarAction($2,$3); }
-	| THIS functionvalue											{ $$ = ReturnValueThisFunctionvalueGrammarAction($1);}
-	| constant SUB constant 															{ $$ = ReturnValueConstantSubGrammarAction($1,$2); }
-	| constant ADD constant 															{ $$ = ReturnValueConstantAddGrammarAction($1,$2); }
-	| constant MUL constant 															{ $$ = ReturnValueConstantMulGrammarAction($1,$2); }
-	| constant DIV constant 															{ $$ = ReturnValueConstantDivGrammarAction($1,$2); }
+	| THIS functionvalue											{ $$ = ReturnValueThisFunctionvalueGrammarAction($2);}
+	| constant SUB constant 															{ $$ = ReturnValueConstantSubGrammarAction($1,$3); }
+	| constant ADD constant 															{ $$ = ReturnValueConstantAddGrammarAction($1,$3); }
+	| constant MUL constant 															{ $$ = ReturnValueConstantMulGrammarAction($1,$3); }
+	| constant DIV constant 															{ $$ = ReturnValueConstantDivGrammarAction($1,$3); }
 	;
 
 value: type 														{ $$ =   TypeValueGrammarAction($1); }

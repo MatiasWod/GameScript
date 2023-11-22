@@ -2,9 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../../backend/support/logger.h"
-#include "../../backend/semantic-analysis/symbol-table.h"
 #include "bison-actions.h"
 #include "../../backend/support/shared.h"
+#include "../../backend/support/utils.h"
 
 /**
  * Implementación de "bison-actions.h".
@@ -16,25 +16,7 @@
 
 
 
- 
-typedef struct Node * List;
 
-struct Node {
-    void * ptr;
-    List next;
-};
-
-
-
-void * Malloc(size_t size) {
-	List allocated_memory = NULL;
-    List new_node = malloc(sizeof(struct Node));
-    void * requested_memory = malloc(size);
-    new_node->ptr = requested_memory;
-    new_node->next = allocated_memory;
-    allocated_memory = new_node;
-    return requested_memory;
-}
 
 void yyerror(const char *string)
 {
@@ -247,7 +229,7 @@ Type ButtonTypeGrammarAction()
 	return type;
 }
 
-Type StringGrammarAction()
+Type StringTypeGrammarAction()
 {
 	LogDebug("\tStringTypeGrammarAction");
 
@@ -343,14 +325,14 @@ Body BodyConditionalsGrammarAction(Conditionals conditionals, Body to_body){
 	return body;
 }
 
-Body BodyThisAssignRetGrammarAction(Array array, Assignment assignment, Functionvalue functionvalue, Body to_body){
+Body BodyThisAssignRetGrammarAction(Array array, Assignment assignment, ReturnValue returnValue, Body to_body){
 	LogDebug("\tBodyThisArrayAssignmentRetGrammarAction");
 
 	Body body = Malloc(sizeof(struct BodyNode));
 	body->bType = BODY_THIS_ARRAY_ASSIGNMENT_RET_BODY;
 	body->array = array;
 	body->assignment = assignment;
-	body->functionvalue = functionvalue;
+	body->returnvalue = returnValue;
 	body->body = to_body;
 
 	return body;

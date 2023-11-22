@@ -1,7 +1,8 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "symbol-table.h"
-
+#include "../support/utils.h"
 typedef struct SymbolObjectNode * SymbolObject;
 
 struct SymbolObjectNode {
@@ -13,65 +14,7 @@ struct SymbolObjectNode {
 
 SymbolObject table[HASH_TABLE_SIZE] = {0};
 
-typedef struct Node * List;
-
-struct Node {
-    void * ptr;
-    List next;
-};
-
 unsigned int scope = 0;
-
-List allocated_memory = NULL;
-
-void Free(void * ptr) {
-    if (ptr == NULL) {
-        return;
-    }
-    
-    List previous = NULL;
-    List head = allocated_memory;
-    boolean found = false;
-    while (!found && head != NULL) {
-        if (head->ptr == ptr) {
-            found = true;
-        } else {
-            previous = head;
-            head = head->next;
-        }
-    }
-
-    if (!found) {
-        return;
-    }
-
-    if (previous == NULL) {
-        allocated_memory = head->next;
-    } else {
-        previous->next = head->next;
-    }
-    free(head->ptr);
-    free(head);
-}
-
-void FreeAll() {
-    while (allocated_memory != NULL) {
-        List to_free = allocated_memory;
-        allocated_memory = to_free->next;
-        free(to_free->ptr);
-        free(to_free);
-    }
-}
-
-
-void * Malloc(size_t size) {
-    List new_node = malloc(sizeof(struct Node));
-    void * requested_memory = malloc(size);
-    new_node->ptr = requested_memory;
-    new_node->next = allocated_memory;
-    allocated_memory = new_node;
-    return requested_memory;
-}
 
 boolean contains(char * key);
 int hash_code(char * string) {
