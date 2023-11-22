@@ -355,7 +355,7 @@ Body BodyFuncGrammarAction(Functionvalue functionvalue, Body to_body){
 	LogDebug("\tBodyThisArrayAssignmentFuncGrammarAction");
 
 	Body body = Malloc(sizeof(struct BodyNode));
-	body->bType = BODY_THIS_ARRAY_ASSIGNMENT_FUNC_BODY;
+	body->bType = BODY_FUNC_BODY;
 	body->functionvalue = functionvalue;
 	body->body = to_body;
 
@@ -366,7 +366,7 @@ Body BodyThisArrayFuncGrammarAction(Array array,Functionvalue functionvalue ,Bod
 	LogDebug("\tBodyFuncGrammarAction");
 
 	Body body = Malloc(sizeof(struct BodyNode));
-	body->bType = BODY_FUNC_BODY;
+	body->bType = BODY_THIS_ARRAY_FUNC_BODY;
 	body->functionvalue = functionvalue;
 	body->body = to_body;
 
@@ -378,7 +378,7 @@ Body BodyTypeAssignConstGrammarAction(Type type, char * varname, Array array, As
 	LogDebug("\tBodyThisArrayFuncGrammarAction");
 
 	Body body = Malloc(sizeof(struct BodyNode));
-	body->bType = BODY_THIS_ARRAY_FUNC_BODY;
+	body->bType = BODY_TYPE_VARNAME_ARRAY_ASSIGNMENT_CONST_BODY;
 	body->array = array;
 	body->body = to_body;
 	body->type = type;
@@ -392,10 +392,10 @@ Body BodyTypeAssignConstGrammarAction(Type type, char * varname, Array array, As
 }
 
 Body BodyTypeArrayGrammarAction(Type type, char* varname, Array array, Body to_body){
-	LogDebug("\tBodyTypeVarnameArrayAssignmentConstGrammarAction");
+	LogDebug("\tBodyTypeArrayGrammarAction");
 
 	Body body = Malloc(sizeof(struct BodyNode));
-	body->bType = BODY_TYPE_VARNAME_ARRAY_ASSIGNMENT_CONST_BODY;
+	body->bType = BODY_TYPE_VARNAME_ARRAY_BODY;
 	body->type = type;
 	body->var = varname;
 	body->array = array;
@@ -410,7 +410,7 @@ Body BodyTypeArrayAssignStringGrammarAction(Type type, char* varname, Array arra
 	LogDebug("\tBodyTypeVarnameArrayGrammarAction");
 
 	Body body = Malloc(sizeof(struct BodyNode));
-	body->bType = BODY_TYPE_VARNAME_ARRAY_BODY;
+	body->bType = BODY_TYPE_VARNAME_ARRAY_ASSIGNMENT_STRING_BODY;
 	body->type = type;
 	body->var = varname;
 	body->array = array;

@@ -1,5 +1,6 @@
 #! /bin/bash
 
+rm game.py
 rm -rf bin
 rm src/frontend/lexical-analysis/flex-scanner.c
 rm src/frontend/syntactic-analysis/bison-parser.c
