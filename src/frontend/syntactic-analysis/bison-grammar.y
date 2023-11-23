@@ -272,8 +272,8 @@ value: type 														{ $$ =   TypeValueGrammarAction($1); }
 functionvalue: VARNAME OPEN_PARENTHESIS parameters CLOSE_PARENTHESIS	{ $$ = FunctionValueGrammarAction($1, $3); }
 	;
 
-conditionals:  WHEN OPEN_PARENTHESIS negation gsboolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE		{ $$ = WhenBodyGrammarAction($3, $4, $7); }
-	| WHEN OPEN_PARENTHESIS negation gsboolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE ELSE OPEN_BRACE body CLOSE_BRACE	{ $$ = WhenElseBodyGrammarAction($3, $4, $7, $11); }
+conditionals:  WHEN OPEN_PARENTHESIS gsboolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE		{ $$ = WhenBodyGrammarAction($3, $6); }
+	| WHEN OPEN_PARENTHESIS  gsboolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE ELSE OPEN_BRACE body CLOSE_BRACE	{ $$ = WhenElseBodyGrammarAction($3, $6, $10); }
 	| IF OPEN_PARENTHESIS negation gsboolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	if_options	{ $$ = IfBodyGrammarAction($3, $4, $7, $9); }
 	| FOR OPEN_PARENTHESIS INT VARNAME EQUAL INTEGER SEMICOLON negation gsboolean SEMICOLON for_options CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE	{ $$ = ForBodyGrammarAction($4, $6, $8, $9, $11, $14); }
 	| WHILE OPEN_PARENTHESIS negation gsboolean CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE			{ $$ = WhileBodyGrammarAction($3, $4, $7); }

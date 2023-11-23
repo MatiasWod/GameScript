@@ -142,9 +142,9 @@ Value FunctionValueValueGrammarAction(Functionvalue to_functionValue);
 
 Functionvalue FunctionValueGrammarAction(char* varname, Parameters parameters);
 
-Conditionals WhenBodyGrammarAction(Negation to_negation, GSBoolean to_boolean, Body to_body);
+Conditionals WhenBodyGrammarAction(GSBoolean to_boolean, Body to_body);
 
-Conditionals WhenElseBodyGrammarAction(Negation to_negation, GSBoolean to_boolean, Body to_firstBody, Body to_secondBody);
+Conditionals WhenElseBodyGrammarAction(GSBoolean to_boolean, Body to_firstBody, Body to_secondBody);
 
 Conditionals IfBodyGrammarAction(Negation to_negation, GSBoolean to_boolean, Body to_firstBody, IfOptions to_ifOptions);
 

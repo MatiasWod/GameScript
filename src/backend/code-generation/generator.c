@@ -28,6 +28,7 @@ boolean variable_context = false;
 boolean conditional_context = false;
 
 char *beforeCycle = NULL;
+char *inCycle = NULL;
 char **Scenes;
 int scene_count = 0;
 char **gobject_array = NULL;
@@ -37,35 +38,89 @@ int array_capacity = 0;
 
 int block_size = 20;
 
-unsigned int current_scope = 0;
+unsigned int scope_current = 0;
+
+boolean inCycle_context = false;
+
+void printTabs(int tabs)
+{
+	for (int i = 0; i < tabs; i++)
+	{
+		appendString("\t");
+	}
+}
 
 void appendString(const char *text)
 {
-	if (beforeCycle == NULL)
+	if (!inCycle_context)
 	{
-		beforeCycle = malloc(10 * sizeof(char)); // Asignación inicial de memoria si es nulo
 		if (beforeCycle == NULL)
 		{
-			printf("Error: No se pudo asignar memoria para beforeCycle.\n");
-			return;
+			beforeCycle = malloc(10 * sizeof(char)); // Asignación inicial de memoria si es nulo
+			if (beforeCycle == NULL)
+			{
+				printf("Error: No se pudo asignar memoria para beforeCycle.\n");
+				return;
+			}
+			beforeCycle[0] = '\0'; // Inicializar el string como vacío
 		}
-		beforeCycle[0] = '\0'; // Inicializar el string como vacío
-	}
 
-	size_t current_length = strlen(beforeCycle);
-	size_t text_length = strlen(text);
+		size_t current_length = strlen(beforeCycle);
+		size_t text_length = strlen(text);
 
-	// Redimensionar el string para agregar el texto
-	char *temp = realloc(beforeCycle, current_length + text_length + 1);
-	if (temp != NULL)
-	{
-		beforeCycle = temp;						 // Asignar el nuevo espacio redimensionado
-		strncat(beforeCycle, text, text_length); // Agregar texto al string
+		// Redimensionar el string para agregar el texto
+		char *temp = realloc(beforeCycle, current_length + text_length + 1);
+		if (temp != NULL)
+		{
+			beforeCycle = temp;						 // Asignar el nuevo espacio redimensionado
+			strncat(beforeCycle, text, text_length); // Agregar texto al string
+		}
+		else
+		{
+			printf("Error: No se pudo redimensionar la memoria para beforeCycle.\n");
+		}
 	}
 	else
 	{
-		printf("Error: No se pudo redimensionar la memoria para beforeCycle.\n");
+		if (inCycle == NULL)
+		{
+			inCycle = malloc(10 * sizeof(char)); // Asignación inicial de memoria si es nulo
+			if (inCycle == NULL)
+			{
+				printf("Error: No se pudo asignar memoria para beforeCycle.\n");
+				return;
+			}
+			inCycle[0] = '\0'; // Inicializar el string como vacío
+		}
+
+		size_t current_length = strlen(inCycle);
+		size_t text_length = strlen(text);
+
+		// Redimensionar el string para agregar el texto
+		char *temp = realloc(inCycle, current_length + text_length + 1);
+		if (temp != NULL)
+		{
+			inCycle = temp;						 // Asignar el nuevo espacio redimensionado
+			strncat(inCycle, text, text_length); // Agregar texto al string
+		}
+		else
+		{
+			printf("Error: No se pudo redimensionar la memoria para inCycle.\n");
+		}
 	}
+}
+
+void fillMovementParams()
+{
+	// switch (body->functionvalue->parameters->returnvalue->gconstant->gcType)
+	// {
+	// case /* constant-expression */:
+	// 	/* code */
+	// 	break;
+
+	// default:
+	// 	break;
+	// }
 }
 
 void Generator(Program program)
@@ -97,6 +152,42 @@ void Generator(Program program)
 
 	fprintf(source_file, "clock = pygame.time.Clock()\n");
 	fprintf(source_file, "running = True\n");
+
+	//finish function
+	fprintf(source_file, "def finish(text):\n");
+	fprintf(source_file, "\tprint(text)\n");
+	fprintf(source_file, "\tglobal running\n");
+	fprintf(source_file, "\trunning = False\n");
+
+	// Seteamos la funcion when_in_
+	fprintf(source_file, "def when_in_string(leftGobject,rightGobject):\n");
+	fprintf(source_file, "\treturn leftGobject.pos[0] < rightGobject.pos[0] + rightGobject.width and leftGobject.pos[0] + leftGobject.width > rightGobject.pos[0] and leftGobject.pos[1] < rightGobject.pos[1] + rightGobject.height and leftGobject.pos[1] + leftGobject.height > rightGobject.pos[1]\n");
+
+	fprintf(source_file, "def bounceX(gobject):\n");
+	fprintf(source_file, "\tgobject.speedx = -gobject.speedx\n");
+	fprintf(source_file, "\tgobject.pos[0] += gobject.speedx\n");
+	fprintf(source_file, "\tgobject.pos[1] += gobject.speedy\n");
+
+	fprintf(source_file, "def bounceY(gobject):\n");
+	fprintf(source_file, "\tgobject.speedy = -gobject.speedy\n");
+	fprintf(source_file, "\tgobject.pos[0] += gobject.speedx\n");
+	fprintf(source_file, "\tgobject.pos[1] += gobject.speedy\n");
+
+	fprintf(source_file, "def stop(gobject):\n");
+	fprintf(source_file, "\tgobject.speedx = 0\n");
+	fprintf(source_file, "\tgobject.speedy = 0\n");
+
+	fprintf(source_file, "def when_in_RIGHT_BORDER_string(gobject):\n");
+	fprintf(source_file, "\treturn gobject.pos[0] > WIDTH\n");
+
+	fprintf(source_file, "def when_in_LEFT_BORDER_string(gobject):\n");
+	fprintf(source_file, "\treturn gobject.pos[0] < 0\n");
+
+	fprintf(source_file, "def when_in_UP_BORDER_string(gobject):\n");
+	fprintf(source_file, "\treturn gobject.pos[1] < 0\n");
+
+	fprintf(source_file, "def when_in_DOWN_BORDER_string(gobject):\n");
+	fprintf(source_file, "\treturn gobject.pos[1] > HEIGHT\n");
 
 	GenerateProgram(program);
 
@@ -167,14 +258,11 @@ void GenerateProgram(Program program)
 	fprintf(source_file, "\tfor event in pygame.event.get():\n");
 	fprintf(source_file, "\t\tif event.type == pygame.QUIT:\n");
 	fprintf(source_file, "\t\t\trunning = False\n");
-	for (int i = 0; i < gobjects_count; i++)
-	{
-		fprintf(source_file, "\t\t%s.assignKeys()\n", gobject_array[i]);
-		fprintf(source_file, "\t\t%s.updateMovement()\n", gobject_array[i]);
-		free(gobject_array[i]);
-	}
-	free(gobject_array);
-	fprintf(source_file, "\t\tdraw()\n");
+
+	fprintf(source_file, inCycle);
+	free(inCycle);
+
+	fprintf(source_file, "\tdraw()\n");
 	for (int i = scene_count; i > 0; i--)
 	{
 		// fprintf(source_file, Scenes[i]);
@@ -205,8 +293,7 @@ void GenerateBody(Body body)
 {
 	LogDebug("Generating body...");
 
-	appendString("\t");
-
+	printTabs(scope_current);
 	switch (body->bType)
 	{
 	case BODY_CONDITIONALS_BODY:
@@ -244,12 +331,77 @@ void GenerateBody(Body body)
 			if (strstr(body->functionvalue->functionName, "setSpeed") != NULL)
 			{
 				LogDebug("%d", body->functionvalue->parameters->returnvalue->constant->value);
-				sprintf(str, "\n%s.speedx = %d\n%s.speedy = %d\n", subString, body->functionvalue->parameters->returnvalue->constant->value, subString, body->functionvalue->parameters->returnvalue->constant->value);
+				appendString("\n");
+				printTabs(scope_current);
+				sprintf(str, "%sSpeed = %d\n", subString, body->functionvalue->parameters->returnvalue->constant->value);
 				appendString(str);
 				LogDebug("DESPUES");
 			}
-		}
+			if (strstr(body->functionvalue->functionName, "setMovement") != NULL)
+			{
+				inCycle_context = true;
+				scope_current++;
+				appendString("\n");
+				printTabs(scope_current);
+				sprintf(str, "%s.assignKeys(%sSpeed ,", subString, subString);
+				appendString(str);
+				GenerateFunctionValue(body->functionvalue);
+				appendString(")\n");
+				printTabs(scope_current);
+				appendString(subString);
+				appendString(".updateMovement()\n");
+				scope_current--;
+				inCycle_context = false;
+			}
+			if (strstr(body->functionvalue->functionName, "setPosition") != NULL)
+			{	
+				if(inCycle_context){
+					printTabs(scope_current);
+				}
+				sprintf(str, "%s.pos = [", subString);
+				appendString(str);
+				GenerateFunctionValue(body->functionvalue);
+				appendString("]\n");
+			}
 
+			if (strstr(body->functionvalue->functionName, "randomMovement") != NULL)
+			{
+				sprintf(str, "\n%s.randomMovement(%sSpeed)\n", subString, subString);
+				appendString(str);
+				inCycle_context = true;
+				scope_current++;
+				printTabs(scope_current);
+				sprintf(str, "%s.updateMovement()\n", subString);
+				appendString(str);
+				scope_current--;
+				inCycle_context = false;
+			}
+			if (strstr(body->functionvalue->functionName, "bounceX") != NULL)
+			{	
+				printTabs(scope_current);
+				LogDebug("ESTO ES ACA 1: skere");
+				sprintf(str, "bounceX(%s)\n", subString);
+				appendString(str);
+			}
+			if (strstr(body->functionvalue->functionName, "bounceY") != NULL)
+			{
+				printTabs(scope_current);
+				sprintf(str, "bounceY(%s)\n", subString);
+				appendString(str);
+			}
+			if (strstr(body->functionvalue->functionName, "stop") != NULL)
+			{
+				printTabs(scope_current);
+				sprintf(str, "stop(%s)\n", subString);
+				appendString(str);
+			}
+		}
+		if (strstr(body->functionvalue->functionName, "finish") != NULL)
+			{
+				printTabs(scope_current);
+				sprintf(str, "finish(\"%s\")\n", body->functionvalue->parameters->returnvalue->constant->str);
+				appendString(str);
+			}
 		GenerateBody(body->body);
 		break;
 	case BODY_THIS_ARRAY_FUNC_BODY:
@@ -263,29 +415,10 @@ void GenerateBody(Body body)
 		break;
 	case BODY_TYPE_VARNAME_ARRAY_ASSIGNMENT_CONST_BODY:
 		LogDebug("type varname = const");
-		switch (body->type->tType)
-		{
-		case T_INT:
-			break;
-		case T_TEXT:
-			break;
-		case T_BOOL:
-			break;
-		case T_CHAR:
-			break;
-		case T_RGB:
-			break;
-		case T_BLOCK:
-			break;
-		case T_GOBJECT:
-			break;
-		case T_SCENE:
-			break;
-		case T_BUTTON:
-			break;
-		case T_STRING:
-			break;
-		}
+		appendString("\n");
+		GenerateVarname(body->var);
+		appendString(" = ");
+		GenerateConstant(body->constant);
 		GenerateBody(body->body);
 		break;
 	case BODY_TYPE_VARNAME_ARRAY_BODY:
@@ -363,7 +496,6 @@ void GenerateBody(Body body)
 		break;
 	case BODY_RETURN_RET:
 		LogDebug("Generating return return body...");
-		appendString("return ");
 		GenerateReturnValue(body->returnvalue);
 		break;
 	case BODY_ONCLICK:
@@ -480,6 +612,10 @@ void GenerateFunction(Function function)
 		appendString("\t\tkeys = pygame.key.get_pressed()\n\t\tself.speedx = 0\n\t\tself.speedy = 0\n\t\tif keys[upkey]:\n\t\t\tself.speedy = -user_speed\n\t\tif keys[downkey]:\n\t\t\tself.speedy = user_speed\n\t\tif keys[rightkey]:\n\t\t\tself.speedx = user_speed\n\t\tif keys[leftkey]:\n\t\t\tself.speedx = -user_speed\n");
 		appendString("\tdef updateMovement(self):\n");
 		appendString("\t\tself.pos[0] += self.speedx\n\t\tself.pos[1] += self.speedy\n");
+		appendString("\tdef randomMovement(self, userSpeed = 0):\n");
+		appendString("\t\tself.speedx = userSpeed*random.choice((-1,1))\n");
+		appendString("\t\tself.speedy = userSpeed*random.choice((-1,1))\n");
+
 		break;
 	case T_SCENE:
 		break;
@@ -573,8 +709,13 @@ void GenerateParameters(Parameters parameters)
 	case P_LAMBDA:
 		break;
 	case P_RETVAL:
+		GenerateReturnValue(parameters->returnvalue);
+
 		break;
 	case P_RETVAL_PARAMS:
+		GenerateReturnValue(parameters->returnvalue);
+		appendString(", ");
+		GenerateParameters(parameters->parameters);
 		break;
 	}
 
@@ -590,8 +731,10 @@ void GenerateVarSingleAction(VarSingleAction varsingleaction)
 	switch (varsingleaction->type)
 	{
 	case S_INCREMENT:
+		appendString("+= 1\n");
 		break;
 	case S_DECREMENT:
+		appendString("-= 1\n");
 		break;
 	}
 
@@ -641,14 +784,17 @@ void GenerateArray(Array array)
 	switch (array->aType)
 	{
 	case ARRAY_VARNAME_ARRAY:
+		printTabs(scope_current);
 		GenerateVarname(array->var);
 		GenerateArray(array->array);
 		break;
 	case ARRAY_INTEGER_ARRAY:
+		printTabs(scope_current);
 		GenerateInteger(array->value);
 		GenerateArray(array->array);
 		break;
 	case ARRAY_ARRAY:
+		printTabs(scope_current);
 		GenerateArray(array->array);
 		break;
 	case ARRAY_LAMBDA:
@@ -729,7 +875,6 @@ void GenerateValue(Value value)
 void GenerateFunctionValue(Functionvalue functionvalue)
 {
 	LogDebug("Generating Functionvalue...");
-	GenerateVarname(functionvalue->functionName);
 	GenerateParameters(functionvalue->parameters);
 
 	LogDebug("Functionvalue generated.");
@@ -742,9 +887,15 @@ void GenerateConditionals(Conditionals conditionals)
 	switch (conditionals->conditionalsType)
 	{
 	case COND_WHEN:
-		GenerateNegation(conditionals->negation);
+		inCycle_context = true;
+		scope_current++;
+		printTabs(scope_current);
+		appendString("if ");
 		GenerateBoolean(conditionals->boolean);
+		appendString(":\n");
 		GenerateBody(conditionals->firstBody);
+		scope_current--;
+		inCycle_context = false;
 		break;
 	case COND_WHEN_ELSE:
 		GenerateNegation(conditionals->negation);
@@ -753,9 +904,16 @@ void GenerateConditionals(Conditionals conditionals)
 		GenerateBody(conditionals->secondBody);
 		break;
 	case COND_IF:
+		inCycle_context = true;
+		scope_current++;
+		printTabs(scope_current);
+		appendString("if ");
 		GenerateNegation(conditionals->negation);
 		GenerateBoolean(conditionals->boolean);
+		appendString(":\n");
 		GenerateBody(conditionals->firstBody);
+		scope_current--;
+		inCycle_context = false;
 		GenerateIfOptions(conditionals->ifoptions);
 		break;
 	case COND_FOR:
@@ -817,9 +975,26 @@ void GenerateIfOptions(IfOptions ifoptions)
 	switch (ifoptions->ifOptionsType)
 	{
 	case IF_OPTIONS_ELSE:
+		inCycle_context = true;
+		scope_current++;
+		printTabs(scope_current);
+		appendString("else ");
+		GenerateBoolean(ifoptions->boolean);
+		appendString(":\n");
+		GenerateBody(ifoptions->body);
+		scope_current--;
+		inCycle_context = false;
 		break;
 	case IF_OPTIONS_ELIF:
+		inCycle_context = true;
+		scope_current++;
+		printTabs(scope_current);
+		appendString("elif ");
 		GenerateBoolean(ifoptions->boolean);
+		appendString(":\n");
+		GenerateBody(ifoptions->body);
+		scope_current--;
+		inCycle_context = false;
 		break;
 	}
 
@@ -868,7 +1043,9 @@ void GenerateGSBoolean(GSBoolean boolean)
 		break;
 	case BOOL_V_IN_V:
 		GenerateVarname(boolean->lefVar);
+		appendString(", ");
 		GenerateVarname(boolean->rightVar);
+		appendString("):\n");
 		break;
 	case BOOL_V_IN_GC:
 		GenerateVarname(boolean->lefVar);
@@ -926,7 +1103,6 @@ void GenerateMathExpression(Mathexp mathExpression)
 		GenerateMathExpression(mathExpression->rightMathExp);
 		break;
 	case MATH_EXP_FACTOR:
-
 		GenerateFactor(mathExpression->factor);
 		break;
 	}
@@ -956,6 +1132,16 @@ void GenerateFactor(Factor factor)
 	return;
 }
 
+void convertToUpper(const char *input)
+{
+	// Iterar a través de cada carácter del string
+	for (size_t i = 0; i < strlen(input); i++)
+	{
+		// Convertir el carácter a mayúsculas y agregarlo a tu estructura de datos
+		char upperChar = toupper(input[i]);
+	}
+}
+
 void GenerateConstant(Constant constant)
 {
 	LogDebug("Generating Constant...");
@@ -963,23 +1149,23 @@ void GenerateConstant(Constant constant)
 	switch (constant->cType)
 	{
 	case CONST_INT:
-		appendString(constant->value);
-		GenerateInteger(constant->value);
+		char numerito[255];
+		sprintf(numerito, "%d", constant->value);
+		appendString(numerito);
+		// appendString("\n");
 		break;
 	case CONST_STR:
+		appendString("pygame.K_");
+		convertToUpper(constant->str);
 		appendString(constant->str);
-		GenerateString(constant->str);
 		break;
 	case CONST_VAR:
-		appendString(constant->var);
 		GenerateVarname(constant->var);
 		break;
 	case CONST_SUB_INT:
-		appendString(constant->value);
 		GenerateInteger(constant->value);
 		break;
 	case CONST_INT_PX:
-		appendString(constant->value);
 		GenerateInteger(constant->value);
 		break;
 	}
@@ -996,26 +1182,35 @@ void GenerateGConstant(GConstant gconstant)
 	switch (gconstant->gcType)
 	{
 	case GC_UP_B:
+		appendString("UP_BORDER");
 		break;
 	case GC_DOWN_B:
+		appendString("DOWN_BORDER");
 		break;
 	case GC_LEFT_B:
+		appendString("LEFT_BORDER");
 		break;
 	case GC_RIGHT_B:
+		appendString("RIGHT_BORDER");
 		break;
 	case GC_UP:
+		appendString("pygame.K_UP");
 		break;
 	case GC_DOWN:
+		appendString("pygame.K_DOWN");
 		break;
 	case GC_LEFT:
+		appendString("pygame.K_LEFT");
 		break;
 	case GC_RIGHT:
+		appendString("pygame.K_RIGHT");
 		break;
 	case GC_SPACE:
 		break;
 	case GC_ENTER:
 		break;
 	case GC_NOKEY:
+		appendString("pygame.BLEND_MULT");
 		break;
 	}
 
@@ -1027,7 +1222,8 @@ void GenerateGConstant(GConstant gconstant)
 void GenerateVarname(char *var)
 {
 	LogDebug("Generating Varname...");
-
+	printTabs(scope_current);
+	appendString(var);
 	LogDebug("Varname generated.");
 
 	return;
@@ -1045,6 +1241,7 @@ void GenerateInteger(int value)
 void GenerateChar(char c)
 {
 	LogDebug("Generating Char...");
+	appendString(c);
 
 	LogDebug("Char generated.");
 
@@ -1068,43 +1265,57 @@ void GenerateBoolean(GSBoolean to_boolean)
 	{
 	case BOOL_LESS_THAN:
 		GenerateMathExpression(to_boolean->leftMathExp);
+		appendString(" < ");
 		GenerateMathExpression(to_boolean->rightMathExp);
 		break;
 	case BOOL_GREATER_THAN:
 		GenerateMathExpression(to_boolean->leftMathExp);
+		appendString(" > ");
 		GenerateMathExpression(to_boolean->rightMathExp);
 		break;
 	case BOOL_LESS_THAN_EQ:
 		GenerateMathExpression(to_boolean->leftMathExp);
+		appendString(" <= ");
 		GenerateMathExpression(to_boolean->rightMathExp);
 		break;
 	case BOOL_GREATER_THAN_EQ:
 		GenerateMathExpression(to_boolean->leftMathExp);
+		appendString(" >= ");
 		GenerateMathExpression(to_boolean->rightMathExp);
 		break;
 	case BOOL_EQ_EQ:
 		GenerateMathExpression(to_boolean->leftMathExp);
+		appendString(" == ");
 		GenerateMathExpression(to_boolean->rightMathExp);
 		break;
 	case BOOL_NOT_EQ:
 		GenerateMathExpression(to_boolean->leftMathExp);
+		appendString(" != ");
 		GenerateMathExpression(to_boolean->rightMathExp);
 		break;
 	case BOOL_OR:
 		GenerateBoolean(to_boolean->leftBoolean);
+		appendString(" or ");
 		GenerateBoolean(to_boolean->rightBoolean);
 		break;
 	case BOOL_AND:
 		GenerateBoolean(to_boolean->leftBoolean);
+		appendString(" and ");
 		GenerateBoolean(to_boolean->rightBoolean);
 		break;
 	case BOOL_V_IN_V:
+		appendString("when_in_string(");
 		GenerateVarname(to_boolean->lefVar);
+		appendString(", ");
 		GenerateVarname(to_boolean->rightVar);
+		appendString(")");
 		break;
 	case BOOL_V_IN_GC:
+		appendString("when_in_");
+		GenerateGConstant(to_boolean->gconstant);
+		appendString("_string(");
 		GenerateVarname(to_boolean->lefVar);
-		GenerateVarname(to_boolean->rightVar);
+		appendString(")");
 		break;
 	case BOOL_VAR:
 		GenerateVarname(to_boolean->var);

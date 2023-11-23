@@ -750,24 +750,22 @@ Functionvalue FunctionValueGrammarAction(char* varname, Parameters parameters){
 	return functionvalue;
 }
 
-Conditionals WhenBodyGrammarAction(Negation to_negation, GSBoolean to_boolean, Body to_body){
+Conditionals WhenBodyGrammarAction(GSBoolean to_boolean, Body to_body){
 	LogDebug("\tWhenBodyGrammarAction");
 	
 	Conditionals conditionals = Malloc(sizeof(struct ConditionalsNode));
 	conditionals->conditionalsType = COND_WHEN;
-	conditionals->negation = to_negation;
 	conditionals->boolean = to_boolean;
 	conditionals->firstBody = to_body;
 
 	return conditionals;
 }
 
-Conditionals WhenElseBodyGrammarAction(Negation to_negation, GSBoolean to_boolean, Body to_firstBody, Body to_secondBody){
+Conditionals WhenElseBodyGrammarAction(GSBoolean to_boolean, Body to_firstBody, Body to_secondBody){
 	LogDebug("\tWhenElseBodyGrammarAction");
 	
 	Conditionals conditionals = Malloc(sizeof(struct ConditionalsNode));
 	conditionals->conditionalsType = COND_WHEN_ELSE;
-	conditionals->negation = to_negation;
 	conditionals->boolean = to_boolean;
 	conditionals->firstBody = to_firstBody;
 	conditionals->secondBody = to_secondBody;
