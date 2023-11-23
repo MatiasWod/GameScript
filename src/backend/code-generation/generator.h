@@ -63,4 +63,8 @@ void GenerateChar(char c);
 
 void GenerateString(char * str);
 
+void GenerateArrayBlock(Body body);
+
+void appendString(const char * str);
+
 #endif

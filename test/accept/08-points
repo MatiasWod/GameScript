@@ -1,4 +1,22 @@
-scene mainScene() {
+
+gobject Player(int speed) {
+   block hitbox[3][1];
+   this.speed = speed;
+   return this;
+}
+
+gobject CollectibleItem(string name, int pointValue) {
+   this.name = name;
+   this.pointValue = pointValue;
+   return this;
+}
+
+scene winScene(string message) {
+   // Display a message when the player wins
+   // You can define scene content and actions here
+}
+
+mainScene() {
    int playerScore = 0;
    int targetScore = 50; // Set the target score needed to win
    
@@ -31,19 +49,3 @@ scene mainScene() {
    // Other game logic and objects can be added here
 }
 
-gobject Player(int speed) {
-   block hitbox[3][1];
-   this.speed = speed;
-   return this;
-}
-
-gobject CollectibleItem(string name, int pointValue) {
-   this.name = name;
-   this.pointValue = pointValue;
-   return this;
-}
-
-scene winScene(string message) {
-   // Display a message when the player wins
-   // You can define scene content and actions here
-}

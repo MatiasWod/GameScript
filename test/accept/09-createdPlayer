@@ -1,3 +1,3 @@
-scene mainScene(){
+mainScene(){
     gobject p1 = Player(1); // también podemos declarar jugadores de esta manera.
 }

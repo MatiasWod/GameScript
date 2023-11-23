@@ -1,4 +1,11 @@
-scene mainScene() {
+block blockGenerator() {
+    block b;
+    b.type = random(0, 3);
+    b.color = random(0, 3);
+    return b;
+}
+
+mainScene() {
     block bloques[10][10];
     for(int i = 0; i < 10; i++) {
         for(int j = 0; j < 10; j++) {
@@ -7,9 +14,3 @@ scene mainScene() {
     }
 }
 
-block blockGenerator() {
-    block b;
-    b.type = random(0, 3);
-    b.color = random(0, 3);
-    return b;
-}

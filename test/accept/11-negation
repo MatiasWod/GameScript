@@ -1,19 +1,9 @@
-scene mainScene(){
-    text title=gameTitle();
-    title.location(5,7);
-    button start=startButton();
-    start.location(5,5); 
-
-    if(1!=2){
-        load(gameScene);
-    }
-
- }
  
  button startButton(){
   label="Start";
   onClick(load(gameScene));
  }
+ 
  text gameTitle(){
    label="Welcome to my game";
    // Only accept sizes in px
@@ -24,3 +14,16 @@ scene mainScene(){
 
  }
  
+
+
+mainScene(){
+    text title=gameTitle();
+    title.location(5,7);
+    button start=startButton();
+    start.location(5,5); 
+
+    if(1!=2){
+        load(gameScene);
+    }
+
+ }

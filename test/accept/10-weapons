@@ -1,4 +1,23 @@
-scene mainScene() {
+gobject Player(int speed) {
+    block hitbox[3][1];
+    this.speed = speed;
+    return this;
+ }
+ 
+ gobject Weapon(string name, int damage) {
+    this.name = name;
+    this.damage = damage;
+    return this;
+ }
+ 
+ gobject Enemy(int speed) {
+    block hitbox[3][1];
+    this.speed = speed;
+    return this;
+ }
+ 
+
+mainScene() {
    int playerLife = 100;
    int enemyLife = 50;
    int playerScore = 0;
@@ -38,20 +57,3 @@ scene mainScene() {
    // Other game logic and objects can be added here
 }
 
-gobject Player(int speed) {
-   block hitbox[3][1];
-   this.speed = speed;
-   return this;
-}
-
-gobject Weapon(string name, int damage) {
-   this.name = name;
-   this.damage = damage;
-   return this;
-}
-
-gobject Enemy(int speed) {
-   block hitbox[3][1];
-   this.speed = speed;
-   return this;
-}

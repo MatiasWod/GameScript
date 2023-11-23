@@ -183,7 +183,7 @@
 program: main_scene													{ $$ = ProgramGrammarAction($1); }
 	;
 
-main_scene: SCENE MAIN_SCENE OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE expression	{ $$ = MainSceneGrammarAction($6, $8); } 
+main_scene: expression MAIN_SCENE OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACE body CLOSE_BRACE 	{ $$ = MainSceneGrammarAction($6, $1); } 
 	;
 expression: %empty 												{ $$ = ExpressionEmptyGrammarAction(); } 
 	| function expression 						{ $$ = ExpressionFunctionGrammarAction($1,$2); } // function
