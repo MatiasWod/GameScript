@@ -8,7 +8,7 @@ Un compilador construido con Flex y Bison, en el marco de la materia Autómatas,
 | Canevaro Bautista | 62179  | bcanevaro@itba.edu.ar |   
 | Hirsch Santiago   | 62169  | shirsch@itba.edu.ar   |
 | Wodtke Matías     | 62098  | mwodtke@itba.edu.ar   |
-|----------------------------------------------------|
+|-------------------|--------|-----------------------|
 
 <hr>
 
@@ -168,7 +168,7 @@ Por último, se debió implementar el análisis semántico del lenguaje, donde s
         {
             finish("Team 1 wins!");
         }
-}
+	}
     ```
 
 2. El siguiente fragmento de código toma ciertas imágenes y las modifica para que sirvan para fondos de pantalla para el celular:
