@@ -64,6 +64,7 @@ Luego, ejecute el compilador desde el directorio raíz del proyecto, pasando por
 ```
 $ ./script/start.sh program
 ```
+Al realizar la ejecucion se creara un archivo "game.py", el cual debe ser ejecutado para poder ver el resultado.
 
 
 ### Testing
