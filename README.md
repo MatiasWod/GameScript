@@ -37,13 +37,14 @@ La idea de este lenguaje nace con la idea de centralizar y versionar el proceso 
 
 ### Requerimientos
 
-Para construir el compilador, se requiere tener instalado [Docker](https://docs.docker.com/engine/install/), junto con la imagen de compilación.
-
-Se debe crear la imagen necesaria utilizando el archivo `Dockerfile`:
-
-```
-$ docker build -t compiler .
-```
+Para poder usar GameScript, se deben tener instaladas las siguientes librerías:
+- Bison
+- CMake
+- Flex
+- gcc
+- make
+- python3
+- PyGame 
 
 ### Construcción
 
@@ -51,7 +52,6 @@ Para construir el proyecto por completo, ejecute en la raíz del repositorio los
 
 ```
 $ chmod u+x --recursive script
-$ docker run -v "${PWD}:/root" -ti --rm alejofl/tla-compiler
 $ ./script/build.sh
 ```
 
@@ -59,7 +59,7 @@ $ ./script/build.sh
 
 Para compilar, primero cree un archivo con el contenido del programa. A modo de ejemplo, el path al archivo (relativo a la raíz del proyecto) será `program`.
 
-Luego, dentro del contenedor de Docker, ejecute el compilador desde el directorio raíz del proyecto, pasando por parámetro el path hacia el programa a compilar:
+Luego, ejecute el compilador desde el directorio raíz del proyecto, pasando por parámetro el path hacia el programa a compilar:
 
 ```
 $ ./script/start.sh program
@@ -68,7 +68,7 @@ $ ./script/start.sh program
 
 ### Testing
 
-Dentro del contenedor de Docker,
+Corra el siguiente comando desde el directorio raíz.
 
 ```
 $ ./script/test.sh
