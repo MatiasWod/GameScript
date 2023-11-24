@@ -8,7 +8,6 @@ Un compilador construido con Flex y Bison, en el marco de la materia Autómatas,
 | Canevaro Bautista | 62179  | bcanevaro@itba.edu.ar |   
 | Hirsch Santiago   | 62169  | shirsch@itba.edu.ar   |
 | Wodtke Matías     | 62098  | mwodtke@itba.edu.ar   |
-|-------------------|--------|-----------------------|
 
 <hr>
 
