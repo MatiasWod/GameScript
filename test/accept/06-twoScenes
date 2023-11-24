@@ -1,9 +1,0 @@
-scene titleScene(){
-    title = "My game";
-}
-
-mainScene(){
-    int num;
-}
-
-

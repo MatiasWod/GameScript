@@ -32,7 +32,8 @@ char *inCycle = NULL;
 char **Scenes;
 int scene_count = 0;
 char **gobject_array = NULL;
-
+char *eventStr = NULL;
+char * draw = NULL;
 int gobjects_count = 0;
 int array_capacity = 0;
 
@@ -47,6 +48,65 @@ void printTabs(int tabs)
 	for (int i = 0; i < tabs; i++)
 	{
 		appendString("\t");
+	}
+}
+
+void appendToDraw(const char *text)
+{
+	if (draw == NULL)
+	{
+		draw = malloc(10 * sizeof(char)); // Asignación inicial de memoria si es nulo
+		if (draw == NULL)
+		{
+			printf("Error: No se pudo asignar memoria para beforeCycle.\n");
+			return;
+		}
+		draw[0] = '\0'; // Inicializar el string como vacío
+	}
+
+	size_t current_length = strlen(draw);
+	size_t text_length = strlen(text);
+
+	// Redimensionar el string para agregar el texto
+	char *temp = realloc(draw, current_length + text_length + 1);
+	if (temp != NULL)
+	{
+		draw = temp;					  // Asignar el nuevo espacio redimensionado
+		strncat(draw, text, text_length); // Agregar texto al string
+	}
+	else
+	{
+		printf("Error: No se pudo redimensionar la memoria para beforeCycle.\n");
+	}
+}
+
+
+void appendToEvent(const char *text)
+{
+	if (eventStr == NULL)
+	{
+		eventStr = malloc(10 * sizeof(char)); // Asignación inicial de memoria si es nulo
+		if (eventStr == NULL)
+		{
+			printf("Error: No se pudo asignar memoria para beforeCycle.\n");
+			return;
+		}
+		eventStr[0] = '\0'; // Inicializar el string como vacío
+	}
+
+	size_t current_length = strlen(eventStr);
+	size_t text_length = strlen(text);
+
+	// Redimensionar el string para agregar el texto
+	char *temp = realloc(eventStr, current_length + text_length + 1);
+	if (temp != NULL)
+	{
+		eventStr = temp;					  // Asignar el nuevo espacio redimensionado
+		strncat(eventStr, text, text_length); // Agregar texto al string
+	}
+	else
+	{
+		printf("Error: No se pudo redimensionar la memoria para beforeCycle.\n");
 	}
 }
 
@@ -147,13 +207,15 @@ void Generator(Program program)
 	fprintf(source_file, "pygame.init()\n");
 	fprintf(source_file, "screen = pygame.display.set_mode((WIDTH, HEIGHT))\n");
 	fprintf(source_file, "pygame.display.set_caption(\"GameScript\")\n");
+	fprintf(source_file, "font = pygame.font.Font('freesansbold.ttf', 32)\n");
+	fprintf(source_file, "button_x = 300\nbutton_y = 400\nbutton_width = 100\nbutton_height = 100\n");
 
 	fprintf(source_file, "block_size = 20\n");
 
 	fprintf(source_file, "clock = pygame.time.Clock()\n");
 	fprintf(source_file, "running = True\n");
 
-	//finish function
+	// finish function
 	fprintf(source_file, "def finish(text):\n");
 	fprintf(source_file, "\tprint(text)\n");
 	fprintf(source_file, "\tglobal running\n");
@@ -243,6 +305,10 @@ void GenerateProgram(Program program)
 	screen.fill((0, 0, 0))*/
 	fprintf(source_file, "def draw():\n");
 	fprintf(source_file, "\tscreen.fill((0, 0, 0))\n");
+	if (draw != NULL) {
+		fprintf(source_file, "\t%s",draw);
+		free(draw);
+	}
 
 	for (int i = 0; i < gobjects_count; i++)
 	{
@@ -258,6 +324,10 @@ void GenerateProgram(Program program)
 	fprintf(source_file, "\tfor event in pygame.event.get():\n");
 	fprintf(source_file, "\t\tif event.type == pygame.QUIT:\n");
 	fprintf(source_file, "\t\t\trunning = False\n");
+	if(eventStr != NULL) {
+		fprintf(source_file, "%s", eventStr);
+		free(eventStr);
+	}
 
 	fprintf(source_file, inCycle);
 	free(inCycle);
@@ -354,9 +424,11 @@ void GenerateBody(Body body)
 				inCycle_context = false;
 			}
 			if (strstr(body->functionvalue->functionName, "setPosition") != NULL)
-			{	
-				if(inCycle_context){
-					printTabs(scope_current);
+			{
+				if (inCycle_context)
+				{
+					appendString("\n");
+					printTabs(scope_current+1);
 				}
 				sprintf(str, "%s.pos = [", subString);
 				appendString(str);
@@ -377,7 +449,7 @@ void GenerateBody(Body body)
 				inCycle_context = false;
 			}
 			if (strstr(body->functionvalue->functionName, "bounceX") != NULL)
-			{	
+			{
 				printTabs(scope_current);
 				LogDebug("ESTO ES ACA 1: skere");
 				sprintf(str, "bounceX(%s)\n", subString);
@@ -397,11 +469,11 @@ void GenerateBody(Body body)
 			}
 		}
 		if (strstr(body->functionvalue->functionName, "finish") != NULL)
-			{
-				printTabs(scope_current);
-				sprintf(str, "finish(\"%s\")\n", body->functionvalue->parameters->returnvalue->constant->str);
-				appendString(str);
-			}
+		{
+			printTabs(scope_current);
+			sprintf(str, "finish(\"%s\")\n", body->functionvalue->parameters->returnvalue->constant->str);
+			appendString(str);
+		}
 		GenerateBody(body->body);
 		break;
 	case BODY_THIS_ARRAY_FUNC_BODY:
@@ -469,18 +541,28 @@ void GenerateBody(Body body)
 		case T_CHAR:
 			break;
 		case T_RGB:
+			char str1[100];
+			sprintf(str1, "\n%s = %s(\n", body->var);
+			GenerateParameters(body->functionvalue->parameters);
+			appendString(str1);
+			appendString(")\n");
 			break;
 		case T_BLOCK:
 			break;
 		case T_GOBJECT:
-			char str[100];
-			sprintf(str, "\n%s = %s()\n", body->var, body->functionvalue->functionName);
-			appendString(str);
+			char str2[100];
+			sprintf(str2, "\n%s = %s()\n", body->var, body->functionvalue->functionName);
+			appendString(str2);
 			newGobject(body->var);
 			break;
 		case T_SCENE:
 			break;
 		case T_BUTTON:
+			char str3[100];
+			inCycle_context = true;
+			sprintf(str3,"\n\tdraw_%s(300,400,250,300,\"BUTTON\")\n",body->functionvalue->functionName);
+			appendToDraw(str3);
+			inCycle_context = false;
 			break;
 		case T_STRING:
 			break;
@@ -500,8 +582,6 @@ void GenerateBody(Body body)
 		break;
 	case BODY_ONCLICK:
 		LogDebug("Generating onclick body...");
-		GenerateFunctionValue(body->functionvalue);
-		GenerateBody(body->body);
 		break;
 	}
 
@@ -620,6 +700,42 @@ void GenerateFunction(Function function)
 	case T_SCENE:
 		break;
 	case T_BUTTON:
+		appendString("def draw_");
+		appendString(function->var);
+		appendString("(");
+		appendString("button");
+		appendString("_x, ");
+		appendString("button");
+		appendString("_y, ");
+		appendString("button");
+		appendString("_width, ");
+		appendString("button");
+		appendString("_height, ");
+		appendString("button");
+		appendString("_text):\n");
+		appendString("\tpygame.draw.rect(screen, (255, 0,0 ), (");
+		appendString("button");
+		appendString("_x, ");
+		appendString("button");
+		appendString("_y, ");
+		appendString("button");
+		appendString("_width, ");
+		appendString("button");
+		appendString("_height))\n");
+		appendString("\t");
+		appendString("button");
+		appendString("_text = font.render(");
+		appendString("button");
+		appendString("_text, True, (255, 255, 255))\n");
+		appendString("\tscreen.blit(");
+		appendString("button");
+		appendString("_text, (");
+		appendString("button");
+		appendString("_x + block_size ,");
+		appendString("button");
+		appendString("_y + block_size))\n");
+		appendString("def is_mouse_on_button(mouse_x,mousey):\n\treturn mouse_x > button_x and mouse_x < button_x + button_width and mouse_y > button_y and mouse_y < button_y + button_height\n");
+		appendToEvent("\t\telif event.type == pygame.MOUSEBUTTONDOWN:\n\t\t\tmouse_x, mouse_y = pygame.mouse.get_pos()\n\t\t\tif is_mouse_on_button(mouse_x, mouse_y):\n\t\t\t\tprint(\"Button clicked\")\n");
 		break;
 	case T_STRING:
 		break;
@@ -750,14 +866,19 @@ void GenerateAssignment(Assignment assignment)
 	switch (assignment->type)
 	{
 	case ASSIGNMENT_EQUAL:
+		appendString(" = ");
 		break;
 	case ASSIGNMENT_PLUS_EQUAL:
+		appendString(" += ");
 		break;
 	case ASSIGNMENT_MINUS_EQUAL:
+		appendString(" -= ");
 		break;
 	case ASSIGNMENT_MUL_EQUAL:
+		appendString(" *= ");
 		break;
 	case ASSIGNMENT_SLASH_EQUAL:
+		appendString(" /= ");
 		break;
 	}
 
@@ -917,12 +1038,34 @@ void GenerateConditionals(Conditionals conditionals)
 		GenerateIfOptions(conditionals->ifoptions);
 		break;
 	case COND_FOR:
-		GenerateVarname(conditionals->varName);
-		GenerateInteger(conditionals->rightValue);
-		GenerateNegation(conditionals->negation);
-		GenerateBoolean(conditionals->boolean);
-		GenerateForOptions(conditionals->foroptions);
-		GenerateBody(conditionals->firstBody);
+		// GenerateVarname(conditionals->varName);
+		// appendString(" = ");
+		// GenerateInteger(conditionals->rightValue);
+		// inCycle_context = true;
+		// scope_current++;
+		// printTabs(scope_current);
+		// appendString("for ");
+		// GenerateVarname(conditionals->varName);
+		// appendString(" in range(");
+		// GenerateInteger(conditionals->rightValue);
+		// appendString(",");
+		// GenerateInteger(conditionals->boolean->rightMathExp->factor->constant->value);
+		// appendString(",");
+
+		// appendString("):\n");
+		// scope_current++;
+		// printTabs(scope_current);
+		// appendString("\n");
+		// printTabs(scope_current);
+		// appendString("if ");
+		// GenerateNegation(conditionals->negation);
+		// GenerateBoolean(conditionals->boolean);
+		// appendString(":\n");
+		// scope_current++;
+		// GenerateBody(conditionals->firstBody);
+		// scope_current--;
+		// scope_current--;
+		// inCycle_context = false;
 		break;
 	case COND_WHILE:
 		GenerateNegation(conditionals->negation);
@@ -943,6 +1086,7 @@ void GenerateNegation(Negation negation)
 	switch (negation->nType)
 	{
 	case N_NOT:
+		appendString("not ");
 		break;
 	}
 
@@ -958,8 +1102,10 @@ void GenerateForOptions(ForOptions foroptions)
 	switch (foroptions->forOptionsType)
 	{
 	case S_INCREMENT:
+		appendString("+= 1\n");
 		break;
 	case S_DECREMENT:
+		appendString("-= 1\n");
 		break;
 	}
 
@@ -1206,8 +1352,10 @@ void GenerateGConstant(GConstant gconstant)
 		appendString("pygame.K_RIGHT");
 		break;
 	case GC_SPACE:
+		appendString("pygame.K_SPACE");
 		break;
 	case GC_ENTER:
+		appendString("pygame.K_KP_ENTER");
 		break;
 	case GC_NOKEY:
 		appendString("pygame.BLEND_MULT");
@@ -1232,7 +1380,9 @@ void GenerateVarname(char *var)
 void GenerateInteger(int value)
 {
 	LogDebug("Generating Integer...");
-
+	char str[100];
+	sprintf(str, "%d", value);
+	appendString(str);
 	LogDebug("Integer generated.");
 
 	return;

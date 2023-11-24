@@ -1,0 +1,20 @@
+gobject Player()
+{
+   block hitbox[2][2]; // 3 posiciones de ancho, 1 posición de altura
+   return this;
+}
+
+mainScene() {
+    gobject p1 = Player();
+    int p1Speed = 3;
+    p1.randomMovement(3);
+    p1.setPosition(400,300);
+    p1.setSpeed(3);
+    when(p1 in UP_BORDER or p1 in DOWN_BORDER )
+    {
+      p1.bounceY();
+   }
+   when (p1 in RIGHT_BORDER or p1 in LEFT_BORDER){
+      p1.bounceX();
+   }
+}

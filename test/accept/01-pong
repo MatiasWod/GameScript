@@ -75,5 +75,13 @@ mainScene()
       ball.bounceY();
    }
 
-   
+   if(team1Score == 10)
+   {
+      finish("Team 1 wins!");
+   }
+   elif (team2Score == 10)
+   {
+      finish("Team 2 wins!");
+   }
+
 }
