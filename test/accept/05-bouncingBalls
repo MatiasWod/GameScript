@@ -1,0 +1,42 @@
+
+gobject Ball()
+{
+    block hitbox[1][1]; // 1 posición de ancho, 1 posición de altura
+                        // this.speed = speed;
+                        // this.movement = both; // el usuario podría definir solo movimiento horizontal/vertical
+    return this;
+}
+
+mainScene(){
+    gobject ball1 = Ball();
+    ball1.setPosition(10, 10);
+    ball1.setSpeed(10);
+    ball1.randomMovement();
+    gobject ball2 = Ball();
+    ball2.setPosition(100, 100);
+    ball2.setSpeed(10);
+    ball2.randomMovement();
+
+    when(ball1 in ball2) {
+        ball1.bounceX();
+        ball2.bounceX();
+        ball1.bounceY();
+        ball2.bounceY();
+    }
+
+    when(ball1 in UP_BORDER or ball1 in DOWN_BORDER) {
+        ball1.bounceY();
+    }
+   when( ball1 in RIGHT_BORDER or ball1 in LEFT_BORDER) {
+        ball1.bounceX();
+    }
+    
+
+    when (ball2 in UP_BORDER or ball2 in DOWN_BORDER ) {
+        ball2.bounceY();
+    }
+    when (ball2 in RIGHT_BORDER or ball2 in LEFT_BORDER) {
+        ball2.bounceX();
+    }
+    
+}

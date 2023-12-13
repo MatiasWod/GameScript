@@ -3,7 +3,8 @@
 #include "backend/support/shared.h"
 #include "frontend/syntactic-analysis/bison-parser.h"
 #include <stdio.h>
-
+#include <stdlib.h>
+#include "backend/support/utils.h"
 // Estado de la aplicación.
 CompilerState state;
 
@@ -11,8 +12,21 @@ CompilerState state;
 const int main(const int argumentCount, const char ** arguments) {
 	// Inicializar estado de la aplicación.
 	state.program = NULL;
-	state.result = 0;
+	state.errors = NULL;
+	state.last_error = NULL;
+	state.error_count = 0;
 	state.succeed = false;
+	state.game_generation = false;
+
+	// Checkeamos que unicamente se ponga el path del archivo a correr, sin argumentos
+
+	if (argumentCount == 1) {
+		state.game_generation = true;
+	}
+	else {
+		LogError("Cantidad de argumentos invalida. Se esperaba unicamente el path del archivo a correr.");
+		return -1;
+	}
 
 	// Mostrar parámetros recibidos por consola.
 	for (int i = 0; i < argumentCount; ++i) {
@@ -28,7 +42,7 @@ const int main(const int argumentCount, const char ** arguments) {
 			// inicial de la gramática satisfactoriamente.
 			if (state.succeed) {
 				LogInfo("La compilacion fue exitosa.");
-				Generator(state.result);
+				Generator(state.program);
 			}
 			else {
 				LogError("Se produjo un error en la aplicacion.");
@@ -37,6 +51,10 @@ const int main(const int argumentCount, const char ** arguments) {
 			break;
 		case 1:
 			LogError("Bison finalizo debido a un error de sintaxis.");
+			while (state.errors != NULL) {
+				printf("%s", state.errors->message);
+				state.errors = state.errors->next;
+			}
 			break;
 		case 2:
 			LogError("Bison finalizo abruptamente debido a que ya no hay memoria disponible.");
@@ -44,6 +62,9 @@ const int main(const int argumentCount, const char ** arguments) {
 		default:
 			LogError("Error desconocido mientras se ejecutaba el analizador Bison (codigo %d).", result);
 	}
+	FreeAll();
 	LogInfo("Fin.");
 	return result;
 }
+
+

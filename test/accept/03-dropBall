@@ -1,0 +1,50 @@
+
+
+gobject Player()
+{
+   block hitbox[8][1]; // 8 posiciones de ancho, 1 posición de altura
+   return this;
+}
+
+gobject Ball()
+{
+    block hitbox[1][1]; // 1 posición de ancho, 1 posición de altura
+    return this;
+}
+
+mainScene() {
+    gobject player = Player();
+    player.setSpeed(7);
+    player.setPosition(400,500);
+    player.setMovement(NOKEY, NOKEY, "d", "a");
+
+    gobject ball = Ball();
+    ball.setSpeed(5);
+    ball.randomMovement(1);
+    ball.setPosition(400, 0);
+
+   when(ball in RIGHT_BORDER)
+   {
+      ball.bounceX();
+
+   }
+   when(ball in LEFT_BORDER)
+   {
+      ball.bounceX();
+
+   }
+   when(ball in UP_BORDER)
+   {
+      ball.bounceY();
+   }
+
+   when (ball in player)
+   {
+      ball.bounceY();
+   }
+
+   when(ball in DOWN_BORDER){
+        finish("Game Over!");
+   }
+}
+

@@ -11,17 +11,18 @@ Un compilador construido con Flex y Bison, en el marco de la materia Autómatas,
 
 <hr>
 
-* [Introducción](#introducción)
-* [Utilización del compilador](#utilización-del-compilador)
-    * [Requerimientos](#requerimientos)
-    * [Construcción](#construcción)
-    * [Ejecución](#ejecución)
-    * [Testing](#testing)
-* [Desarrollo del proyecto](#desarrollo-del-proyecto)
-* [Ejemplos de código](#ejemplos-de-código)
-* [Limitaciones y dificultades encontradas](#limitaciones-y-dificultades-encontradas)
-* [Futuras extensiones y modificaciones](#futuras-extensiones-y-modificaciones)
-* [Conclusiones](#conclusiones)
+- [GameScript - PyGame Engine](#gamescript---pygame-engine)
+  - [Introducción](#introducción)
+  - [Utilización del compilador](#utilización-del-compilador)
+    - [Requerimientos](#requerimientos)
+    - [Construcción](#construcción)
+    - [Ejecución](#ejecución)
+    - [Testing](#testing)
+  - [Desarrollo del proyecto](#desarrollo-del-proyecto)
+  - [Ejemplos de código](#ejemplos-de-código)
+  - [Limitaciones y dificultades encontradas](#limitaciones-y-dificultades-encontradas)
+  - [Futuras extensiones y modificaciones](#futuras-extensiones-y-modificaciones)
+  - [Conclusiones](#conclusiones)
 
 <hr>
 

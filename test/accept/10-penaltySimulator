@@ -1,0 +1,90 @@
+gobject wall()
+{
+   block hitbox[10][1];
+   return this;
+}
+
+gobject GoalKeeper()
+{
+   block hitbox[5][1];
+   return this;
+}
+
+gobject Kicker()
+{
+   block hitbox[4][1];
+   return this;
+}
+
+gobject Ball()
+{
+   block hitbox[1][1];
+   return this;
+}
+
+mainScene()
+{
+   int goals=0;
+   int catches=0;
+
+   gobject gk = GoalKeeper();
+   gk.setSpeed(5);
+   gk.setPosition(120, 50);
+   gk.setMovement(NOKEY, NOKEY, RIGHT, LEFT);
+
+   gobject Kicker = Kicker();
+   Kicker.setSpeed(7);
+   Kicker.setPosition(400, 500);
+   Kicker.setMovement("w", "s", "d", "a");
+
+   gobject ball = Ball();
+   ball.setSpeed(5);
+   ball.setPosition(400, 400);
+   ball.randomMovement(1);
+
+   gobject wall1 = wall();
+   wall1.setPosition(0, 0);
+
+   gobject wall2 = wall();
+   wall2.setPosition(600, 0);
+
+   when(ball in wall1 or ball in wall2)
+   {
+      ball.bounceY();
+   }
+
+   when(ball in gk)
+   {
+      catches++;
+      ball.bounceY();
+      ball.setPosition(400, 400);
+   }
+
+   when(ball in Kicker)
+   {
+      ball.bounceY();
+   }
+
+   when(ball in RIGHT_BORDER or ball in LEFT_BORDER)
+   {
+      ball.bounceX();
+   }
+
+   when(ball in DOWN_BORDER)
+   {
+      ball.bounceY();
+   }
+
+   when(ball in UP_BORDER)
+   {
+      goals++;
+   }
+
+   if(goals==1){
+      finish("Kicker wins!");
+   }
+
+   if(catches==5){
+      finish("GoalKeeper wins!");
+   }
+}

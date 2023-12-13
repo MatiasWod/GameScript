@@ -1,7 +1,7 @@
-#include "../../backend/support/logger.h"
-#include "flex-actions.h"
 #include <stdlib.h>
 #include <string.h>
+#include "../../backend/support/logger.h"
+#include "flex-actions.h"
 
 /**
  * Implementación de "flex-actions.h".
@@ -461,6 +461,7 @@ token DotPatternAction()
 token OpenBracePatternAction()
 {
 	LogDebug("[Flex] OpenBracePatternAction: '{'.");
+	StepIntoScope();
 	yylval.token = OPEN_BRACE;
 	return OPEN_BRACE;
 }
@@ -468,6 +469,7 @@ token OpenBracePatternAction()
 token CloseBracePatternAction()
 {
 	LogDebug("[Flex] CloseBracePatternAction: '}'.");
+	LeaveScope();
 	yylval.token = CLOSE_BRACE;
 	return CLOSE_BRACE;
 }
@@ -533,7 +535,7 @@ token VarPatternAction(const char *lexeme, const int length)
 {
 	LogDebug("[Flex] VarPatternAction: '%s' (length = %d).", lexeme, length);
 	char *lexemeCopy = copyLexeme(lexeme, length);
-	yylval.string = lexemeCopy;
+	yylval.str = lexemeCopy;
 	//return NAME;
 	return VARNAME;
 }
@@ -542,7 +544,7 @@ token VarnamePatternAction(const char * lexeme, const int length) {
 	LogDebug("VarnamePatternAction: '%s' (length = %d).", lexeme, length);
     char * varname = (char *) calloc(length + 1, sizeof(char));
     strncpy(varname, lexeme, length);
-    yylval.string = varname;
+    yylval.str = varname;
 	return VARNAME;
 }
 
@@ -550,7 +552,7 @@ token StringTextPatternAction(const char * lexeme, const int length) {
 	LogDebug("StringTextPatternAction: '%s' (length = %d).", lexeme, length);
 	char * string = (char *) calloc(length + 1, sizeof(char));
 	strncpy(string, lexeme, length);
-	yylval.string = string;
+	yylval.str = string;
 	return STRING_TEXT;
 }
 
@@ -573,7 +575,7 @@ token CharTextPatternAction(const char * lexeme, const int length)
 	LogDebug("[Flex] CharTextPatternAction: '%s' (length = %d).", lexeme, length);
 	char * charText = (char *) calloc(length + 1, sizeof(char));
 	strncpy(charText, lexeme, length);
-	yylval.string = charText;
+	yylval.str = charText;
 	return CHAR_TEXT;
 }
 

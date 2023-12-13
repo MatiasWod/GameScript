@@ -1,3 +1,0 @@
-scene mainScene(){
-    block hitbox[1][1];
-}

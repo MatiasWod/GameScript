@@ -1,3 +1,12 @@
-scene mainScene(){
-    gobject p1 = Player(1); // también podemos declarar jugadores de esta manera.
+
+gobject Player()
+{
+   block hitbox[4][4];
+   return this;
+}
+mainScene(){
+    gobject p1 = Player();
+   p1.setMovement(UP, DOWN, RIGHT, LEFT);
+   p1.setPosition(200, 300);
+   p1.setSpeed(6);
 }

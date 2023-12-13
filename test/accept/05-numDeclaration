@@ -1,3 +1,0 @@
-scene mainScene(){
-    int num; //podemos declarar variables tipo int!
-}

@@ -1,0 +1,73 @@
+gobject Player()
+{
+   block hitbox[3][1]; // 3 posiciones de ancho, 1 posición de altura
+   return this;
+}
+
+gobject Net()
+{
+   block hitbox[100][1]; // 3 posiciones de ancho, 1 posición de altura
+   return this;
+
+}
+
+gobject Ball()
+{
+   block hitbox[1][1]; // 3 posiciones de ancho, 1 posición de altura
+   return this;
+}
+
+mainScene() {
+    gobject net = Net();
+    net.setPosition(400, 0);
+    gobject ball = Ball();
+    gobject p1 = Player();
+    gobject p1bis = Player();
+    gobject p2 = Player();
+    gobject p2bis = Player();
+    int p1Score = 0;
+    int p2Score = 0;
+    ball.setSpeed(5);
+    ball.randomMovement(5);
+    ball.setPosition(300,300);
+    net.setPosition(0,300);
+    p1.setPosition(100,500);
+    p1bis.setPosition(300,500);
+    p1.setSpeed(4);
+    p1bis.setSpeed(4);
+    p1.setMovement(UP,DOWN,RIGHT,LEFT);
+    p1bis.setMovement(UP,DOWN,RIGHT,LEFT);
+    p2.setPosition(100,200);
+    p2bis.setPosition(300,200);
+    p2.setSpeed(4);
+    p2bis.setSpeed(4);
+    p2.setMovement("w","s","d","a");
+    p2bis.setMovement("w","s","d","a");
+
+    when(ball in UP_BORDER)
+    {
+      p1Score++;
+      ball.bounceY();
+   }
+
+   when(ball in DOWN_BORDER){
+      p2Score++;
+      ball.bounceY();
+   }
+
+   when (ball in RIGHT_BORDER or ball in LEFT_BORDER){
+      ball.bounceX();
+   }
+
+   when (ball in p1 or ball in p1bis) {
+      ball.bounceY();
+   }
+
+   when (ball in p2 or ball in p2bis) {
+      ball.bounceY();
+   }
+
+   if( p1Score == 5 or p2Score == 5){
+      finish("FIN DEL JUEGO");
+   }
+}
