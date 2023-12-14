@@ -171,22 +171,6 @@ Por último, se debió implementar el análisis semántico del lenguaje, donde s
 	}
     ```
 
-2. El siguiente fragmento de código toma ciertas imágenes y las modifica para que sirvan para fondos de pantalla para el celular:
-
-    ```
-    filter blur = filter("BLUR");
-    filter other_filter = filter()
-                              .parameter(shadows=0.6)
-                              .parameter(brightness=0.5);
-    
-    for wallpaper in set(image("playa.jpg");, image("mar.jpg"), image("cielo.png")) {
-        wallpaper.apply(blur, other_filter);
-        wallpaper.trim(width=1080.0, height=1920.0, position=center-center);
-        wallpaper.save();
-    }
-    ```
-
-
 ## Limitaciones y dificultades encontradas
 
 Nos encontramos con un gran número de dificultades a lo largo del desarrollo del proyecto. En primer lugar, cubrir todos los casos que se habían propuesto, pese a los grandes esfuerzos del grupo por desarrollar y entender los conceptos de la mejor manera, en un principio no resultó posible debido a la poca disponibilidad de tiempo con la que contamos para esta tarea.
